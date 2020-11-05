@@ -49,9 +49,9 @@ class PathFinding {
     JLabel cellsL = new JLabel(cells + "x" + cells);
 
     //BUTTONS
-    JButton searchB = new JButton("Start Game");
-    JButton genMapB = new JButton("Place Gold");
-    JButton clearMapB = new JButton("Clear Map");
+    JButton start = new JButton("Start Game");
+    JButton place_golds = new JButton("Place Gold");
+    JButton clearMap = new JButton("Clear Map");
 
     //PANELS
     JPanel toolP = new JPanel();
@@ -74,14 +74,17 @@ class PathFinding {
     }
 
     public void start_game(){
-
+        map[0][0].setType(4); // A
+        map[cells-1][0].setType(4); // B
+        map[cells-1][cells-1].setType(4); // C
+        map[0][cells-1].setType(4); // D
     }
 
     // Random gold placement
     public void visible_golds() {
         clearMap();	// CREATE CLEAR MAP TO START
+
         for(int i = 0; i < (cells*cells)/5; i++) {
-            Node current;
             int x = 0;
             int y = 0;
             do {
@@ -89,13 +92,13 @@ class PathFinding {
                 y = r.nextInt(cells);
 
                 //System.out.println(x + " " + y); // Manuel Debug
-                current = map[x][y]; // FIND A RANDOM NODE IN THE GRID
 
-            } while(current.getType() == 2 || (((x == 0 && y == 0) || (x == (cells - 1) && y == 0) || (x == 0 && y == (cells - 1)) || (x == (cells - 1) && y == (cells - 1))))); // IF IT IS ALREADY A WALL, FIND A NEW ONE
+            } while(((x == 0 && y == 0) || (x == (cells - 1) && y == 0) || (x == 0 && y == (cells - 1)) || (x == (cells - 1) && y == (cells - 1))));
 
-            current.setType(2);	// SET NODE TO BE A WALL
-            gold_x[i] = current.x;
-            gold_y[i] = current.y ;
+            map[x][y].setType(2);
+
+            gold_x[i] = map[x][y].x;
+            gold_y[i] = map[x][y].y;
         }
         unvisible_golds();
     }
@@ -138,6 +141,13 @@ class PathFinding {
         }
     }
 
+    // UPDATE ELEMENTS OF THE GUI
+    public void Update() {
+        CSIZE = MSIZE/cells;
+        canvas.repaint();
+        cellsL.setText(cells + "x" + cells);
+    }
+
     // INITIALIZE THE GUI ELEMENTS
     private void initialize() {
         frame = new JFrame();
@@ -156,16 +166,16 @@ class PathFinding {
         toolP.setLayout(null);
         toolP.setBounds(10,10,210,600);
 
-        searchB.setBounds(40,space, 120, 25);
-        toolP.add(searchB);
+        start.setBounds(40,space, 120, 25);
+        toolP.add(start);
         space+=buff;
 
-        genMapB.setBounds(40,space, 120, 25);
-        toolP.add(genMapB);
+        place_golds.setBounds(40,space, 120, 25);
+        toolP.add(place_golds);
         space+=buff;
 
-        clearMapB.setBounds(40,space, 120, 25);
-        toolP.add(clearMapB);
+        clearMap.setBounds(40,space, 120, 25);
+        toolP.add(clearMap);
         space+=40;
 
         sizeL.setBounds(15,space,40,25);
@@ -183,22 +193,24 @@ class PathFinding {
         canvas.setBounds(230, 10, MSIZE+1, MSIZE+1);
         frame.getContentPane().add(canvas);
 
-        searchB.addActionListener(new ActionListener() {    // ACTION LISTENERS
+        // ACTION LISTENERS
+        start.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if((startx > -1 && starty > -1) && (finishx > -1 && finishy > -1))
-                    solving = true;
+               start_game();
+               Update();
             }
         });
 
-        genMapB.addActionListener(new ActionListener() {
+        place_golds.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 visible_golds();
                 Update();
             }
         });
-        clearMapB.addActionListener(new ActionListener() {
+
+        clearMap.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 clearMap();
@@ -216,18 +228,8 @@ class PathFinding {
         });
     }
 
-    public void Update() {	//UPDATE ELEMENTS OF THE GUI
-        CSIZE = MSIZE/cells;
-        canvas.repaint();
-        cellsL.setText(cells + "x" + cells);
-    }
-
-    class Map extends JPanel implements MouseListener, MouseMotionListener {	//MAP CLASS
-
-        public Map() {
-            addMouseListener(this);
-            addMouseMotionListener(this);
-        }
+    // MAP CLASS
+    class Map extends JPanel {
 
         public void paintComponent(Graphics g) {
             int random = 0;
@@ -235,7 +237,7 @@ class PathFinding {
             super.paintComponent(g);  // REPAINT
             for(int x = 0; x < cells; x++) {	// PAINT EACH NODE IN THE GRID
                 for(int y = 0; y < cells; y++) {
-                    //System.out.println(map[x][y].getType());
+                    //System.out.println(map[x][y].getType()); // Manuel Debug
                     switch(map[x][y].getType()) {
                         case 1: // unvisible Gold Placement
                             g.setColor(Color.WHITE);
@@ -250,63 +252,32 @@ class PathFinding {
                         case 3: // Clear Map
                             g.setColor(Color.WHITE);
                             break;
+                        case 4: // PLAYER A
+                            g.setColor(Color.GRAY);
+                            break;
                     }
+
                     g.fillRect(x*CSIZE,y*CSIZE, CSIZE, CSIZE);
                     g.setColor(Color.BLUE);
+                    g.drawRect(x*CSIZE,y*CSIZE, CSIZE, CSIZE);
+
                     if (map[x][y].getType() == 2)
                     {
                         g.setColor(Color.BLACK);
                         g.drawString(Integer.toString(random), x*CSIZE, y*CSIZE + 10);
                     }
+
                     /*if (map[x][y].getType() == 1)
                     {
                         g.setColor(Color.RED);
                         g.drawString(Integer.toString(random), x*CSIZE, y*CSIZE + 10);
                     }*/
-                    g.drawRect(x*CSIZE,y*CSIZE, CSIZE, CSIZE);
-
                 }
             }
-            for (int i = 0; i < random_control.size(); i++)
-                System.out.println(random_control.get(i));
+            /*for (int i = 0; i < random_control.size(); i++)
+                System.out.println(random_control.get(i));*/
         }
-
-        @Override
-        public void mouseDragged(MouseEvent e) {
-            try {
-                int x = e.getX()/CSIZE;
-                int y = e.getY()/CSIZE;
-                Node current = map[x][y];
-                Update();
-            } catch(Exception z) {}
-        }
-
-        @Override
-        public void mouseMoved(MouseEvent e) {}
-
-        @Override
-        public void mouseClicked(MouseEvent e) {}
-
-        @Override
-        public void mouseEntered(MouseEvent e) {}
-
-        @Override
-        public void mouseExited(MouseEvent e) {}
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-            //resetMap();	//RESET THE MAP WHENEVER CLICKED
-            try {
-                int x = e.getX()/CSIZE;	//GET THE X AND Y OF THE MOUSE CLICK IN RELATION TO THE SIZE OF THE GRID
-                int y = e.getY()/CSIZE;
-                Node current = map[x][y];
-
-            } catch(Exception z) {}	//EXCEPTION HANDLER
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {}
-    }
+}
 
     class Node {
 
@@ -324,13 +295,6 @@ class PathFinding {
             this.x = x;
             this.y = y;
             hops = -1;
-        }
-
-        public double getEuclidDist() {		//CALCULATES THE EUCLIDIAN DISTANCE TO THE FINISH NODE
-            int xdif = Math.abs(x-finishx);
-            int ydif = Math.abs(y-finishy);
-            dToEnd = Math.sqrt((xdif*xdif)+(ydif*ydif));
-            return dToEnd;
         }
 
         //GET METHODS
