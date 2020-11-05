@@ -50,7 +50,7 @@ class PathFinding {
 
     //BUTTONS
     JButton start = new JButton("Start Game");
-    JButton place_golds = new JButton("Place Gold");
+    JButton golds_players_placement = new JButton("Placement");
     JButton clearMap = new JButton("Clear Map");
 
     //PANELS
@@ -73,13 +73,6 @@ class PathFinding {
         initialize();
     }
 
-    public void start_game(){
-        map[0][0].setType(4); // A
-        map[cells-1][0].setType(4); // B
-        map[cells-1][cells-1].setType(4); // C
-        map[0][cells-1].setType(4); // D
-    }
-
     // Random gold placement
     public void visible_golds() {
         clearMap();	// CREATE CLEAR MAP TO START
@@ -93,7 +86,8 @@ class PathFinding {
 
                 //System.out.println(x + " " + y); // Manuel Debug
 
-            } while(((x == 0 && y == 0) || (x == (cells - 1) && y == 0) || (x == 0 && y == (cells - 1)) || (x == (cells - 1) && y == (cells - 1))));
+
+            } while(map[x][y].getType() == 2 || ((x == 0 && y == 0) || (x == (cells - 1) && y == 0) || (x == 0 && y == (cells - 1)) || (x == (cells - 1) && y == (cells - 1))));
 
             map[x][y].setType(2);
 
@@ -101,6 +95,14 @@ class PathFinding {
             gold_y[i] = map[x][y].y;
         }
         unvisible_golds();
+        player_placement();
+    }
+
+    public void player_placement(){
+        map[0][0].setType(4); // A
+        map[cells-1][0].setType(4); // B
+        map[cells-1][cells-1].setType(4); // C
+        map[0][cells-1].setType(4); // D
     }
 
     public void unvisible_golds() {
@@ -164,14 +166,14 @@ class PathFinding {
         int buff = 45;
 
         toolP.setLayout(null);
-        toolP.setBounds(10,10,210,600);
+        toolP.setBounds(10,10,210,200);
 
         start.setBounds(40,space, 120, 25);
         toolP.add(start);
         space+=buff;
 
-        place_golds.setBounds(40,space, 120, 25);
-        toolP.add(place_golds);
+        golds_players_placement.setBounds(40,space, 120, 25);
+        toolP.add(golds_players_placement);
         space+=buff;
 
         clearMap.setBounds(40,space, 120, 25);
@@ -197,12 +199,10 @@ class PathFinding {
         start.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-               start_game();
-               Update();
             }
         });
 
-        place_golds.addActionListener(new ActionListener() {
+        golds_players_placement.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 visible_golds();
@@ -233,7 +233,6 @@ class PathFinding {
 
         public void paintComponent(Graphics g) {
             int random = 0;
-            int a = 0;
             super.paintComponent(g);  // REPAINT
             for(int x = 0; x < cells; x++) {	// PAINT EACH NODE IN THE GRID
                 for(int y = 0; y < cells; y++) {
@@ -265,6 +264,12 @@ class PathFinding {
                     {
                         g.setColor(Color.BLACK);
                         g.drawString(Integer.toString(random), x*CSIZE, y*CSIZE + 10);
+                    }
+
+                    else if(map[x][y].getType() == 4)
+                    {
+                        g.setColor(Color.GREEN);
+                        g.drawString("A", x*CSIZE + 12, y*CSIZE + 20);
                     }
 
                     /*if (map[x][y].getType() == 1)
