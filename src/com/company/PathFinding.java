@@ -1,7 +1,5 @@
 package com.company;
 
-import javafx.css.CssMetaData;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,6 +32,7 @@ class PathFinding {
     private int CSIZE = MSIZE/cells;
     public  int [] gold_x = new int[value];
     public  int [] gold_y = new int[value];
+    public ArrayList<Integer> random_control = new ArrayList<>();
 
     //BOOLEANS
     private boolean solving = false;
@@ -231,9 +230,8 @@ class PathFinding {
         }
 
         public void paintComponent(Graphics g) {
-            //int[] a = {5, 10, 15, 20};
             int random = 0;
-
+            int a = 0;
             super.paintComponent(g);  // REPAINT
             for(int x = 0; x < cells; x++) {	// PAINT EACH NODE IN THE GRID
                 for(int y = 0; y < cells; y++) {
@@ -241,10 +239,13 @@ class PathFinding {
                     switch(map[x][y].getType()) {
                         case 1: // unvisible Gold Placement
                             g.setColor(Color.WHITE);
+                            random = r.nextInt(20/5)*5 + 5;
+                            random_control.add(random);
                             break;
                         case 2: // Gold Placement
                             g.setColor(Color.ORANGE);
                             random = r.nextInt(20/5)*5 + 5;
+                            random_control.add(random);
                             break;
                         case 3: // Clear Map
                             g.setColor(Color.WHITE);
@@ -257,10 +258,17 @@ class PathFinding {
                         g.setColor(Color.BLACK);
                         g.drawString(Integer.toString(random), x*CSIZE, y*CSIZE + 10);
                     }
+                    /*if (map[x][y].getType() == 1)
+                    {
+                        g.setColor(Color.RED);
+                        g.drawString(Integer.toString(random), x*CSIZE, y*CSIZE + 10);
+                    }*/
                     g.drawRect(x*CSIZE,y*CSIZE, CSIZE, CSIZE);
 
                 }
             }
+            for (int i = 0; i < random_control.size(); i++)
+                System.out.println(random_control.get(i));
         }
 
         @Override
