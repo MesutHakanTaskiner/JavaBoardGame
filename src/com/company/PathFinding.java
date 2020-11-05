@@ -1,18 +1,15 @@
 package com.company;
 
-import java.awt.Graphics;
-import java.awt.Color;
+import javafx.css.CssMetaData;
+
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.Random;
-
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
@@ -25,29 +22,24 @@ class PathFinding {
     JFrame frame;
 
     //GENERAL VARIABLES
+    public static int value = 500;
     private int cells = 20;
-    private int delay = 30;
-    private double dense = .5;
-    private double density = (cells*cells)*.5;
     private int startx = -1;
     private int starty = -1;
     private int finishx = -1;
     private int finishy = -1;
-    private int tool = 0;
-    private int checks = 0;
-    private int length = 0;
-    private int curAlg = 0;
-    private int WIDTH = 850;
+    private final int WIDTH = 850;
     private final int HEIGHT = 650;
     private final int MSIZE = 600;
     private int CSIZE = MSIZE/cells;
+    public  int [] gold_x = new int[value];
+    public  int [] gold_y = new int[value];
 
     //BOOLEANS
     private boolean solving = false;
 
     //UTIL
     Node[][] map;
-    Algorithm Alg = new Algorithm();
     Random r = new Random();
 
     //Slider Size
@@ -55,7 +47,7 @@ class PathFinding {
 
     //LABELS
     JLabel sizeL = new JLabel("Size:");
-    JLabel cellsL = new JLabel(cells+"x"+cells);
+    JLabel cellsL = new JLabel(cells + "x" + cells);
 
     //BUTTONS
     JButton searchB = new JButton("Start Game");
@@ -71,28 +63,66 @@ class PathFinding {
     //BORDER
     Border loweredetched = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
 
-    public static void main(String[] args) {	// MAIN METHOD
+    // MAIN METHOD
+    public static void main(String[] args) {
         new PathFinding();
     }
 
-    public PathFinding() {	// CONSTRUCTOR
+    // CONSTRUCTOR
+    public PathFinding() {
         clearMap();
         initialize();
     }
 
+    public void start_game(){
+
+    }
+
     // Random gold placement
-    public void generateMap() {
+    public void visible_golds() {
         clearMap();	// CREATE CLEAR MAP TO START
-        for(int i = 0; i < (cells*cells)/5 ; i++) {
+        for(int i = 0; i < (cells*cells)/5; i++) {
             Node current;
+            int x = 0;
+            int y = 0;
             do {
-                int x = r.nextInt(cells);
-                int y = r.nextInt(cells);
-                //System.out.println(x + " " + y);
-                current = map[x][y];// FIND A RANDOM NODE IN THE GRID
-            } while(current.getType() == 2);	// IF IT IS ALREADY A WALL, FIND A NEW ONE
+                x = r.nextInt(cells);
+                y = r.nextInt(cells);
+
+                //System.out.println(x + " " + y); // Manuel Debug
+                current = map[x][y]; // FIND A RANDOM NODE IN THE GRID
+
+            } while(current.getType() == 2 || (((x == 0 && y == 0) || (x == (cells - 1) && y == 0) || (x == 0 && y == (cells - 1)) || (x == (cells - 1) && y == (cells - 1))))); // IF IT IS ALREADY A WALL, FIND A NEW ONE
+
             current.setType(2);	// SET NODE TO BE A WALL
+            gold_x[i] = current.x;
+            gold_y[i] = current.y ;
         }
+        unvisible_golds();
+    }
+
+    public void unvisible_golds() {
+        int Random = 0, Old_random = 0;
+        ArrayList<Integer> control = new ArrayList<Integer>();
+
+        for(int i = 0; i < (cells*cells)/50; i++)
+        {
+            while (control.contains(Random)){
+                Random = r.nextInt(cells);
+            }
+                if(control.contains(Random)){
+                    //System.out.println("if" + " " + Random); // Manuel Debug
+                }
+                else {
+                    //System.out.println("else" + " " + Random); // Manuel Debug
+                    map[gold_x[Random]][gold_y[Random]].setType(1);
+                }
+
+                //System.out.println(gold_x[Random] + " " + gold_y[Random]); // Manuel Debug
+                control.add(Random);
+                Random = 0;
+        }
+        control.clear();
     }
 
     // Clear Map
@@ -107,7 +137,6 @@ class PathFinding {
                 map[x][y] = new Node(3, x, y);	//SET ALL NODES TO EMPTY
             }
         }
-        //reset();	// RESET SOME VARIABLES
     }
 
     // INITIALIZE THE GUI ELEMENTS
@@ -132,10 +161,6 @@ class PathFinding {
         toolP.add(searchB);
         space+=buff;
 
-        /*resetB.setBounds(40,space,120,25);
-        toolP.add(resetB);
-        space+=buff;*/
-
         genMapB.setBounds(40,space, 120, 25);
         toolP.add(genMapB);
         space+=buff;
@@ -153,31 +178,24 @@ class PathFinding {
         toolP.add(cellsL);
         space+=buff;
 
-
         frame.getContentPane().add(toolP);
 
         canvas = new Map();
         canvas.setBounds(230, 10, MSIZE+1, MSIZE+1);
         frame.getContentPane().add(canvas);
 
-        searchB.addActionListener(new ActionListener() {		//ACTION LISTENERS
+        searchB.addActionListener(new ActionListener() {    // ACTION LISTENERS
             @Override
             public void actionPerformed(ActionEvent e) {
                 if((startx > -1 && starty > -1) && (finishx > -1 && finishy > -1))
                     solving = true;
             }
         });
-        /*resetB.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                resetMap();
-                Update();
-            }
-        });*/
+
         genMapB.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                generateMap();
+                visible_golds();
                 Update();
             }
         });
@@ -197,15 +215,12 @@ class PathFinding {
                 Update();
             }
         });
-
-        //startSearch();	//START STATE
     }
 
     public void Update() {	//UPDATE ELEMENTS OF THE GUI
-        density = (cells*cells)*dense;
         CSIZE = MSIZE/cells;
         canvas.repaint();
-        cellsL.setText(cells+"x"+cells);
+        cellsL.setText(cells + "x" + cells);
     }
 
     class Map extends JPanel implements MouseListener, MouseMotionListener {	//MAP CLASS
@@ -215,34 +230,35 @@ class PathFinding {
             addMouseMotionListener(this);
         }
 
-        public void paintComponent(Graphics g) {	//REPAINT
-            //super.paintComponent(g);
+        public void paintComponent(Graphics g) {
+            //int[] a = {5, 10, 15, 20};
+            int random = 0;
+
+            super.paintComponent(g);  // REPAINT
             for(int x = 0; x < cells; x++) {	// PAINT EACH NODE IN THE GRID
                 for(int y = 0; y < cells; y++) {
-                    System.out.println(map[x][y].getType());
+                    //System.out.println(map[x][y].getType());
                     switch(map[x][y].getType()) {
-                        case 0:
-                            g.setColor(Color.YELLOW);
-                            break;
-                        case 1:
-                            g.setColor(Color.RED);
-                            break;
-                        case 2:
-                            g.setColor(Color.ORANGE);
-                            break;
-                        case 3:
+                        case 1: // unvisible Gold Placement
                             g.setColor(Color.WHITE);
                             break;
-                        case 4:
-                            g.setColor(Color.CYAN);
+                        case 2: // Gold Placement
+                            g.setColor(Color.ORANGE);
+                            random = r.nextInt(20/5)*5 + 5;
                             break;
-                        case 5:
-                            g.setColor(Color.YELLOW);
+                        case 3: // Clear Map
+                            g.setColor(Color.WHITE);
                             break;
                     }
                     g.fillRect(x*CSIZE,y*CSIZE, CSIZE, CSIZE);
                     g.setColor(Color.BLUE);
+                    if (map[x][y].getType() == 2)
+                    {
+                        g.setColor(Color.BLACK);
+                        g.drawString(Integer.toString(random), x*CSIZE, y*CSIZE + 10);
+                    }
                     g.drawRect(x*CSIZE,y*CSIZE, CSIZE, CSIZE);
+
                 }
             }
         }
@@ -253,8 +269,6 @@ class PathFinding {
                 int x = e.getX()/CSIZE;
                 int y = e.getY()/CSIZE;
                 Node current = map[x][y];
-                if((tool == 2 || tool == 3) && (current.getType() != 0 && current.getType() != 1))
-                    current.setType(tool);
                 Update();
             } catch(Exception z) {}
         }
@@ -278,156 +292,12 @@ class PathFinding {
                 int x = e.getX()/CSIZE;	//GET THE X AND Y OF THE MOUSE CLICK IN RELATION TO THE SIZE OF THE GRID
                 int y = e.getY()/CSIZE;
                 Node current = map[x][y];
-                switch(tool ) {
-                    case 0: {	//START NODE
-                        if(current.getType()!=2) {	//IF NOT WALL
-                            if(startx > -1 && starty > -1) {	//IF START EXISTS SET IT TO EMPTY
-                                map[startx][starty].setType(3);
-                                map[startx][starty].setHops(-1);
-                            }
-                            current.setHops(0);
-                            startx = x;	//SET THE START X AND Y
-                            starty = y;
-                            current.setType(0);	//SET THE NODE CLICKED TO BE START
-                        }
-                        break;
-                    }
-                    case 1: {//FINISH NODE
-                        if(current.getType()!=2) {	//IF NOT WALL
-                            if(finishx > -1 && finishy > -1)	//IF FINISH EXISTS SET IT TO EMPTY
-                                map[finishx][finishy].setType(3);
-                            finishx = x;	//SET THE FINISH X AND Y
-                            finishy = y;
-                            current.setType(1);	//SET THE NODE CLICKED TO BE FINISH
-                        }
-                        break;
-                    }
-                    default:
-                        if(current.getType() != 0 && current.getType() != 1)
-                            current.setType(tool);
-                        break;
-                }
-                Update();
+
             } catch(Exception z) {}	//EXCEPTION HANDLER
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {}
-    }
-
-    class Algorithm {	//ALGORITHM CLASS
-
-        //DIJKSTRA WORKS BY PROPAGATING OUTWARDS UNTIL IT FINDS THE FINISH AND THEN WORKING ITS WAY BACK TO GET THE PATH
-        //IT USES A PRIORITY QUE TO KEEP TRACK OF NODES THAT IT NEEDS TO EXPLORE
-        //EACH NODE IN THE PRIORITY QUE IS EXPLORED AND ALL OF ITS NEIGHBORS ARE ADDED TO THE QUE
-        //ONCE A NODE IS EXLPORED IT IS DELETED FROM THE QUE
-        //AN ARRAYLIST IS USED TO REPRESENT THE PRIORITY QUE
-        //A SEPERATE ARRAYLIST IS RETURNED FROM A METHOD THAT EXPLORES A NODES NEIGHBORS
-        //THIS ARRAYLIST CONTAINS ALL THE NODES THAT WERE EXPLORED, IT IS THEN ADDED TO THE QUE
-        //A HOPS VARIABLE IN EACH NODE REPRESENTS THE NUMBER OF NODES TRAVELED FROM THE START
-        public void Dijkstra() {
-            ArrayList<Node> priority = new ArrayList<Node>();	//CREATE A PRIORITY QUE
-            priority.add(map[startx][starty]);	//ADD THE START TO THE QUE
-            while(solving) {
-                if(priority.size() <= 0) {	//IF THE QUE IS 0 THEN NO PATH CAN BE FOUND
-                    solving = false;
-                    break;
-                }
-                int hops = priority.get(0).getHops()+1;	//INCREMENT THE HOPS VARIABLE
-                ArrayList<Node> explored = exploreNeighbors(priority.get(0), hops);	//CREATE AN ARRAYLIST OF NODES THAT WERE EXPLORED
-                if(explored.size() > 0) {
-                    priority.remove(0);	//REMOVE THE NODE FROM THE QUE
-                    priority.addAll(explored);	//ADD ALL THE NEW NODES TO THE QUE
-                    Update();
-                } else {	//IF NO NODES WERE EXPLORED THEN JUST REMOVE THE NODE FROM THE QUE
-                    priority.remove(0);
-                }
-            }
-        }
-
-        //A STAR WORKS ESSENTIALLY THE SAME AS DIJKSTRA CREATING A PRIORITY QUE AND PROPAGATING OUTWARDS UNTIL IT FINDS THE END
-        //HOWEVER ASTAR BUILDS IN A HEURISTIC OF DISTANCE FROM ANY NODE TO THE FINISH
-        //THIS MEANS THAT NODES THAT ARE CLOSER TO THE FINISH WILL BE EXPLORED FIRST
-        //THIS HEURISTIC IS BUILT IN BY SORTING THE QUE ACCORDING TO HOPS PLUS DISTANCE UNTIL THE FINISH
-        public void AStar() {
-            ArrayList<Node> priority = new ArrayList<Node>();
-            priority.add(map[startx][starty]);
-            while(solving) {
-                if(priority.size() <= 0) {
-                    solving = false;
-                    break;
-                }
-                int hops = priority.get(0).getHops()+1;
-                ArrayList<Node> explored = exploreNeighbors(priority.get(0),hops);
-                if(explored.size() > 0) {
-                    priority.remove(0);
-                    priority.addAll(explored);
-                    Update();
-                } else {
-                    priority.remove(0);
-                }
-                sortQue(priority);	//SORT THE PRIORITY QUE
-            }
-        }
-
-        public ArrayList<Node> sortQue(ArrayList<Node> sort) {	//SORT PRIORITY QUE
-            int c = 0;
-            while(c < sort.size()) {
-                int sm = c;
-                for(int i = c+1; i < sort.size(); i++) {
-                    if(sort.get(i).getEuclidDist()+sort.get(i).getHops() < sort.get(sm).getEuclidDist()+sort.get(sm).getHops())
-                        sm = i;
-                }
-                if(c != sm) {
-                    Node temp = sort.get(c);
-                    sort.set(c, sort.get(sm));
-                    sort.set(sm, temp);
-                }
-                c++;
-            }
-            return sort;
-        }
-
-        public ArrayList<Node> exploreNeighbors(Node current, int hops) {	//EXPLORE NEIGHBORS
-            ArrayList<Node> explored = new ArrayList<Node>();	//LIST OF NODES THAT HAVE BEEN EXPLORED
-            for(int a = -1; a <= 1; a++) {
-                for(int b = -1; b <= 1; b++) {
-                    int xbound = current.getX()+a;
-                    int ybound = current.getY()+b;
-                    if((xbound > -1 && xbound < cells) && (ybound > -1 && ybound < cells)) {	//MAKES SURE THE NODE IS NOT OUTSIDE THE GRID
-                        Node neighbor = map[xbound][ybound];
-                        if((neighbor.getHops()==-1 || neighbor.getHops() > hops) && neighbor.getType()!=2) {	//CHECKS IF THE NODE IS NOT A WALL AND THAT IT HAS NOT BEEN EXPLORED
-                            explore(neighbor, current.getX(), current.getY(), hops);	//EXPLORE THE NODE
-                            explored.add(neighbor);	//ADD THE NODE TO THE LIST
-                        }
-                    }
-                }
-            }
-            return explored;
-        }
-
-        public void explore(Node current, int lastx, int lasty, int hops) {	//EXPLORE A NODE
-            if(current.getType()!=0 && current.getType() != 1)	//CHECK THAT THE NODE IS NOT THE START OR FINISH
-                current.setType(4);	//SET IT TO EXPLORED
-            current.setLastNode(lastx, lasty);	//KEEP TRACK OF THE NODE THAT THIS NODE IS EXPLORED FROM
-            current.setHops(hops);	//SET THE HOPS FROM THE START
-            checks++;
-            if(current.getType() == 1) {	//IF THE NODE IS THE FINISH THEN BACKTRACK TO GET THE PATH
-                backtrack(current.getLastX(), current.getLastY(),hops);
-            }
-        }
-
-        public void backtrack(int lx, int ly, int hops) {	//BACKTRACK
-            length = hops;
-            while(hops > 1) {	//BACKTRACK FROM THE END OF THE PATH TO THE START
-                Node current = map[lx][ly];
-                current.setType(5);
-                lx = current.getLastX();
-                ly = current.getLastY();
-                hops--;
-            }
-            solving = false;
-        }
     }
 
     class Node {
@@ -455,14 +325,16 @@ class PathFinding {
             return dToEnd;
         }
 
-        public int getX() {return x;}		//GET METHODS
+        //GET METHODS
+        public int getX() {return x;}
         public int getY() {return y;}
         public int getLastX() {return lastX;}
         public int getLastY() {return lastY;}
         public int getType() {return cellType;}
         public int getHops() {return hops;}
 
-        public void setType(int type) {cellType = type;}		//SET METHODS
+        //SET METHODS
+        public void setType(int type) {cellType = type;}
         public void setLastNode(int x, int y) {lastX = x; lastY = y;}
         public void setHops(int hops) {this.hops = hops;}
     }
