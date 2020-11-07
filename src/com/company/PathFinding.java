@@ -1,11 +1,11 @@
 package com.company;
 
+import com.sun.javafx.collections.MappingChange;
+import oracle.jrockit.jfr.JFR;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.*;
@@ -13,6 +13,36 @@ import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.xml.soap.Node;
+
+/*class Player_A < T extends PathFinding & Node>{
+
+    public int gold = 200;
+    public int a = 0;
+
+    public Player_A(){
+        PathFinding pathfinding = new PathFinding();
+
+        int x = 0, y = 0;
+
+        a = pathfinding.map[x][y].x + pathfinding.map[x][y].y;
+        //System.out.println(a);
+
+        for (x = 0; x < pathfinding.cells; x++){
+            for (y = 0; y < pathfinding.cells; y++){
+                pathfinding.map.
+                int equal = 0;
+
+                if(a != pathfinding.map[x][y].x + pathfinding.map[x][y].y){
+                    equal = pathfinding.map[x][y].x + pathfinding.map[x][y].y;
+                    System.out.println(equal);
+
+                }
+
+            }
+        }
+    }
+}*/
 
 class PathFinding {
 
@@ -21,17 +51,19 @@ class PathFinding {
 
     //GENERAL VARIABLES
     public static int value = 500;
-    private int cells = 20;
-    private int startx = -1;
-    private int starty = -1;
-    private int finishx = -1;
-    private int finishy = -1;
-    private final int WIDTH = 850;
-    private final int HEIGHT = 650;
-    private final int MSIZE = 600;
-    private int CSIZE = MSIZE/cells;
+    public int cells = 20;
+    public int startx = -1;
+    public int starty = -1;
+    public int finishx = -1;
+    public int finishy = -1;
+    public final int WIDTH = 850;
+    public final int HEIGHT = 650;
+    public final int MSIZE = 600;
+    public int CSIZE = MSIZE/cells;
     public  int [] gold_x = new int[value];
     public  int [] gold_y = new int[value];
+    public boolean control = true;
+    public int golds = 200;
     public ArrayList<Integer> random_control = new ArrayList<>();
 
     //BOOLEANS
@@ -43,15 +75,20 @@ class PathFinding {
 
     //Slider Size
     JSlider size = new JSlider(1,5,2);
+    JSlider starting_gold = new JSlider(1,5,1);
 
     //LABELS
     JLabel sizeL = new JLabel("Size:");
     JLabel cellsL = new JLabel(cells + "x" + cells);
 
+    //TEXT FIELD
+    JTextField players_gold = new JTextField(Integer.toString(golds));
+
     //BUTTONS
     JButton start = new JButton("Start Game");
     JButton golds_players_placement = new JButton("Placement");
     JButton clearMap = new JButton("Clear Map");
+    JButton get_golds = new JButton("Get Golds");
 
     //PANELS
     JPanel toolP = new JPanel();
@@ -73,6 +110,46 @@ class PathFinding {
         initialize();
     }
 
+    public void start_game(){
+
+       do{
+           Player_A();
+           golds -= 5;
+       }while (golds != 0);
+    }
+
+    public void get_golds(){
+        String text = players_gold.getText();
+        golds = Integer.parseInt(text);
+    }
+
+    public void Player_A(){
+
+        int x = 0, y = 0, a = 0, b = 0;
+
+        int equal = (cells-1)*(cells-1);
+        int[] eq = new int[2];
+
+        a = map[x][y].x;
+        b = map[x][y].y;
+
+        for (x = 0; x < cells; x++) {
+            for (y = 0; y < cells; y++) {
+                if (map[x][y].getType() == 2) {
+                    if ((map[x][y].x + map[x][y].y) < equal) {
+                        equal = map[x][y].x + map[x][y].y;
+                        eq[0] = map[x][y].x;
+                        eq[1] = map[x][y].y;
+                        a = eq[0];
+                        b = eq[1];
+                    }
+                }
+            }
+            map[a][b].setType(3);
+            map[eq[0]][eq[1]].setType(4);
+        }
+    }
+
     // Random gold placement
     public void visible_golds() {
         clearMap();	// CREATE CLEAR MAP TO START
@@ -85,7 +162,6 @@ class PathFinding {
                 y = r.nextInt(cells);
 
                 //System.out.println(x + " " + y); // Manuel Debug
-
 
             } while(map[x][y].getType() == 2 || ((x == 0 && y == 0) || (x == (cells - 1) && y == 0) || (x == 0 && y == (cells - 1)) || (x == (cells - 1) && y == (cells - 1))));
 
@@ -100,9 +176,9 @@ class PathFinding {
 
     public void player_placement(){
         map[0][0].setType(4); // A
-        map[cells-1][0].setType(4); // B
-        map[cells-1][cells-1].setType(4); // C
-        map[0][cells-1].setType(4); // D
+        map[cells-1][0].setType(5); // B
+        map[cells-1][cells-1].setType(6); // C
+        map[0][cells-1].setType(7); // D
     }
 
     public void unvisible_golds() {
@@ -131,6 +207,7 @@ class PathFinding {
 
     // Clear Map
     public void clearMap() {
+        control = true;
         finishx = 0;	// RESET THE START AND FINISH
         finishy = -1;
         startx = -1;
@@ -166,7 +243,7 @@ class PathFinding {
         int buff = 45;
 
         toolP.setLayout(null);
-        toolP.setBounds(10,10,210,200);
+        toolP.setBounds(10,10,210,400);
 
         start.setBounds(40,space, 120, 25);
         toolP.add(start);
@@ -180,6 +257,15 @@ class PathFinding {
         toolP.add(clearMap);
         space+=40;
 
+        players_gold.setToolTipText("Varsayılan 200 Altın");
+        players_gold.setBounds(40,space, 120, 25);
+        toolP.add(players_gold);
+        space+=40;
+
+        get_golds.setBounds(40,space, 120, 25);
+        toolP.add(get_golds);
+        space+=40;
+        
         sizeL.setBounds(15,space,40,25);
         toolP.add(sizeL);
         size.setMajorTickSpacing(10);
@@ -199,6 +285,15 @@ class PathFinding {
         start.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                start_game();
+                Update();
+            }
+        });
+
+        start.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                get_golds();
             }
         });
 
@@ -231,22 +326,37 @@ class PathFinding {
     // MAP CLASS
     class Map extends JPanel {
 
+        int random = 0;
+        int [] randomArray = new int[cells*cells/5];
+
+        public void createRandom (boolean rand){
+
+            if(rand == true)
+                for (int i = 0 ; i < cells*cells/5 ; i++)
+                {
+                    random = r.nextInt(20 / 5) * 5 + 5;
+                    randomArray[i]= random;
+                }
+        }
+
+        boolean rand1 = true;
+
         public void paintComponent(Graphics g) {
-            int random = 0;
+            int count = 0 ;
+
+            createRandom(rand1);
+            rand1 = false;
+
             super.paintComponent(g);  // REPAINT
-            for(int x = 0; x < cells; x++) {	// PAINT EACH NODE IN THE GRID
-                for(int y = 0; y < cells; y++) {
+            for (int x = 0; x < cells; x++) {    // PAINT EACH NODE IN THE GRID
+                for (int y = 0; y < cells; y++) {
                     //System.out.println(map[x][y].getType()); // Manuel Debug
                     switch(map[x][y].getType()) {
                         case 1: // unvisible Gold Placement
                             g.setColor(Color.WHITE);
-                            random = r.nextInt(20/5)*5 + 5;
-                            random_control.add(random);
                             break;
                         case 2: // Gold Placement
                             g.setColor(Color.ORANGE);
-                            random = r.nextInt(20/5)*5 + 5;
-                            random_control.add(random);
                             break;
                         case 3: // Clear Map
                             g.setColor(Color.WHITE);
@@ -254,46 +364,69 @@ class PathFinding {
                         case 4: // PLAYER A
                             g.setColor(Color.GRAY);
                             break;
+                        case 5: // PLAYER B
+                            g.setColor(Color.PINK);
+                            break;
+                        case 6: // PLAYER C
+                            g.setColor(Color.MAGENTA);
+                            break;
+                        case 7: // PLAYER D
+                            g.setColor(Color.CYAN);
+                            break;
                     }
+                        g.fillRect(x * CSIZE, y * CSIZE, CSIZE, CSIZE);
+                        g.setColor(Color.BLUE);
+                        g.drawRect(x * CSIZE, y * CSIZE, CSIZE, CSIZE);
 
-                    g.fillRect(x*CSIZE,y*CSIZE, CSIZE, CSIZE);
-                    g.setColor(Color.BLUE);
-                    g.drawRect(x*CSIZE,y*CSIZE, CSIZE, CSIZE);
+                        if (map[x][y].getType() == 2) {
+                            g.setColor(Color.BLACK);
+                            g.drawString(Integer.toString(randomArray[count]), x * CSIZE, y * CSIZE + 10);
+                            count++;
+                        }
 
-                    if (map[x][y].getType() == 2)
-                    {
-                        g.setColor(Color.BLACK);
-                        g.drawString(Integer.toString(random), x*CSIZE, y*CSIZE + 10);
-                    }
+                        if (map[x][y].getType() == 4) {
+                            g.setColor(Color.BLACK);
+                            g.drawString("A", x * CSIZE + 12, y * CSIZE + 18);
+                        }
 
-                    else if(map[x][y].getType() == 4)
-                    {
-                        g.setColor(Color.GREEN);
-                        g.drawString("A", x*CSIZE + 12, y*CSIZE + 20);
-                    }
+                        if (map[x][y].getType() == 5) {
+                            g.setColor(Color.BLACK);
+                            g.drawString("B", x * CSIZE + 12, y * CSIZE + 18);
+                        }
+
+                        if (map[x][y].getType() == 6) {
+                            g.setColor(Color.BLACK);
+                            g.drawString("C", x * CSIZE + 12, y * CSIZE + 18);
+                        }
+
+                        if (map[x][y].getType() == 7) {
+                            g.setColor(Color.BLACK);
+                            g.drawString("D", x * CSIZE + 12, y * CSIZE + 18);
+                        }
 
                     /*if (map[x][y].getType() == 1)
                     {
                         g.setColor(Color.RED);
                         g.drawString(Integer.toString(random), x*CSIZE, y*CSIZE + 10);
                     }*/
+                    }
                 }
-            }
             /*for (int i = 0; i < random_control.size(); i++)
                 System.out.println(random_control.get(i));*/
+            }
         }
-}
 
-    class Node {
+
+    public static class Node {
 
         // 0 = start, 1 = finish, 2 = wall, 3 = empty, 4 = checked, 5 = finalpath
-        private int cellType = 0;
-        private int hops;
-        private int x;
-        private int y;
-        private int lastX;
-        private int lastY;
-        private double dToEnd = 0;
+        public int cellType = 0;
+        public int hops;
+        public int x;
+        public int y;
+        public int lastX;
+        public int lastY;
+        public double dToEnd = 0;
 
         public Node(int type, int x, int y) {	//CONSTRUCTOR
             cellType = type;
