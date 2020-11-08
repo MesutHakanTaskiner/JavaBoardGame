@@ -64,6 +64,7 @@ class PathFinding {
     public  int [] gold_y = new int[value];
     public boolean control = true;
     public int golds = 200;
+    public int first = 0, second = 0;
     public ArrayList<Integer> random_control = new ArrayList<>();
 
     //BOOLEANS
@@ -124,12 +125,11 @@ class PathFinding {
 
     public void Player_A(){
 
-        int x = 0, y = 0, a = 0, b = 0;
+        int x = 0, y = 0;
 
         int equal = (cells-1)+(cells-1); // 38
         int[] eq = new int[2];
-
-        a = map[x][y].x + map[x][y].y; // 0
+        
 
         for (x = 0; x < cells; x++) {
             for (y = 0; y < cells; y++) {
@@ -138,15 +138,16 @@ class PathFinding {
                         equal = map[x][y].x + map[x][y].y;
                         eq[0] = map[x][y].x;
                         eq[1] = map[x][y].y;
-                        a = eq[0];
-                        b = eq[1];
                     }
                 }
             }
         }
-            map[a][b].setType(4);
             map[eq[0]][eq[1]].setType(4);
-            //System.out.println(eq[0] + " " + eq[1]);
+            map[first][second].setType(3);
+
+            first = eq[0];
+            second = eq[1];
+
     }
 
     // Random gold placement
@@ -364,6 +365,12 @@ class PathFinding {
                         g.setColor(Color.BLUE);
                         g.drawRect(x * CSIZE, y * CSIZE, CSIZE, CSIZE);
 
+                    /*if (map[x][y].getType() == 1)
+                    {
+                        g.setColor(Color.RED);
+                        g.drawString(Integer.toString(random), x*CSIZE, y*CSIZE + 10);
+                    }*/
+
                     if (map[x][y].getType() == 2) {
                         g.setColor(Color.BLACK);
                         g.drawString(Integer.toString(random), x * CSIZE, y * CSIZE + 10);
@@ -388,18 +395,10 @@ class PathFinding {
                         g.setColor(Color.BLACK);
                         g.drawString("D", x * CSIZE + 12, y * CSIZE + 18);
                     }
-
-                    /*if (map[x][y].getType() == 1)
-                    {
-                        g.setColor(Color.RED);
-                        g.drawString(Integer.toString(random), x*CSIZE, y*CSIZE + 10);
-                    }*/
-                    }
                 }
-            /*for (int i = 0; i < random_control.size(); i++)
-                System.out.println(random_control.get(i));*/
             }
         }
+    }
 
 
     public static class Node {
