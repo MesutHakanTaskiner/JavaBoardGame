@@ -64,7 +64,9 @@ class PathFinding {
     public  int [] gold_y = new int[value];
     public boolean control = true;
     public int golds = 200;
-    public int first = 0, second = 0;
+    public int first_a = 0, second_a = 0;
+    public int first_b = cells-1, second_b = 0;
+    public int number_of_steps_a = 0, number_of_steps_b = 0, number_of_steps_c = 0, number_of_steps_d= 0;
     public ArrayList<Integer> random_control = new ArrayList<>();
 
     //BOOLEANS
@@ -113,7 +115,8 @@ class PathFinding {
 
     public void start_game(){
        do{
-           Player_A();
+           //Player_A();
+           Player_B();
            golds -= 5;
        }while (golds != 0);
     }
@@ -123,13 +126,11 @@ class PathFinding {
         golds = Integer.parseInt(text);
     }
 
-    public void Player_A(){
-
+    /*public void Player_A(){
         int x = 0, y = 0;
 
-        int equal = (cells-1)+(cells-1); // 38
+        int equal = (cells-1)+(cells-1);
         int[] eq = new int[2];
-        
 
         for (x = 0; x < cells; x++) {
             for (y = 0; y < cells; y++) {
@@ -143,11 +144,50 @@ class PathFinding {
             }
         }
             map[eq[0]][eq[1]].setType(4);
-            map[first][second].setType(3);
+            number_of_steps_a++;
+            map[first_a][second_a].setType(3);
 
-            first = eq[0];
-            second = eq[1];
+            first_a = eq[0];
+            second_a = eq[1];
+    }*/
 
+    public void Player_B(){
+
+        int x = cells-1, y = 0;
+
+        int close_number = 0, number = cells-1, close_number2 = 0, proximity = 0, proximity2 = -1, random_x = 10, random_y = 0;
+
+        int[] eq = new int[2];
+
+        close_number = random_x;
+        proximity = Math.abs(random_x - number);
+
+        for (x = cells-1; x > 0; x--) {
+            for (y = 0; y < cells; y++) {
+                if (map[x][y].getType() == 2) {
+                    random_x = map[x][y].x + map[x][y].y;
+                    if (Math.abs(random_x - number) < proximity){
+                        proximity = Math.abs(random_x - number);
+                        close_number = random_x;
+                        eq[0] = map[x][y].x;
+                        eq[1] = map[x][y].y;
+                        //System.out.println(eq[0] + " " + eq[1]);
+                    }
+                    else if (Math.abs(random_x - number) == proximity){
+                        if(random_x != close_number){
+                            proximity2 = proximity;
+                            close_number2 = random_x;
+                        }
+                    }
+                }
+            }
+        }
+        map[eq[0]][eq[1]].setType(5);
+        number_of_steps_b++;
+        map[first_b][second_b].setType(3);
+
+        first_b = eq[0];
+        second_b = eq[1];
     }
 
     // Random gold placement
