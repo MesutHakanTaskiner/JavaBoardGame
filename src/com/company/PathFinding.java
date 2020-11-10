@@ -1,8 +1,5 @@
 package com.company;
 
-import com.sun.javafx.collections.MappingChange;
-import oracle.jrockit.jfr.JFR;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,35 +11,6 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.xml.soap.Node;
-
-/*class Player_A < T extends PathFinding & Node>{
-
-    public int gold = 200;
-    public int a = 0;
-
-    public Player_A(){
-        PathFinding pathfinding = new PathFinding();
-
-        int x = 0, y = 0;
-
-        a = pathfinding.map[x][y].x + pathfinding.map[x][y].y;
-        //System.out.println(a);
-
-        for (x = 0; x < pathfinding.cells; x++){
-            for (y = 0; y < pathfinding.cells; y++){
-                pathfinding.map.
-                int equal = 0;
-
-                if(a != pathfinding.map[x][y].x + pathfinding.map[x][y].y){
-                    equal = pathfinding.map[x][y].x + pathfinding.map[x][y].y;
-                    System.out.println(equal);
-
-                }
-
-            }
-        }
-    }
-}*/
 
 class PathFinding {
 
