@@ -41,8 +41,7 @@ class PathFinding {
     public int golds_d = 200;
     public int first_a = 0, second_a = 0;
     public int first_b = cells-1, second_b = 0;
-    public int number_of_steps_a = 0, number_of_steps_b = 0, number_of_steps_c = 0, number_of_steps_d= 0;
-    public ArrayList<Integer> random_control = new ArrayList<>();
+    public int number_of_steps_a = 0, number_of_steps_b = 0, number_of_steps_c = 0, number_of_steps_d = 0;
     public int [][] visible_golds = new int [cells][cells];
 
     //BOOLEANS
@@ -90,14 +89,19 @@ class PathFinding {
     }
 
     public void start_game() throws InterruptedException, IOException {
-        File file = new File("Player_B.txt");
-        if (!file.exists()) {
-            file.createNewFile();
+        File file_a = new File("Player_A.txt");
+        if (!file_a.exists()) {
+            file_a.createNewFile();
+        }
+
+        File file_b = new File("Player_B.txt");
+        if (!file_b.exists()) {
+            file_b.createNewFile();
         }
 
        do{
-           //Player_A();
-           Player_B(file);
+           Player_A(file_a);
+           Player_B(file_b);
            golds_b -= 5;
        }while (golds_b != 0);
     }
@@ -110,7 +114,10 @@ class PathFinding {
         golds_d = Integer.parseInt(text);
     }
 
-    /*public void Player_A(){
+    public void Player_A(File file_a) throws IOException {
+        FileWriter fileWriter = new FileWriter(file_a, true);
+        BufferedWriter bWriter_a = new BufferedWriter(fileWriter);
+
         int x = 0, y = 0;
 
         int equal = (cells-1)+(cells-1);
@@ -123,22 +130,29 @@ class PathFinding {
                         equal = map[x][y].x + map[x][y].y;
                         eq[0] = map[x][y].x;
                         eq[1] = map[x][y].y;
+                        golds_a += visible_golds[x][y];
                     }
                 }
             }
         }
+            bWriter_a.write(eq[0] + " " + eq[1]);
+            bWriter_a.newLine();
+
             map[eq[0]][eq[1]].setType(4);
+            canvas.repaint();
             number_of_steps_a++;
             map[first_a][second_a].setType(3);
+            canvas.repaint();
 
             first_a = eq[0];
             second_a = eq[1];
-    }*/
+            bWriter_a.close();
+    }
 
-    public void Player_B(File file) throws InterruptedException, IOException {
+    public void Player_B(File file_b) throws InterruptedException, IOException {
 
-        FileWriter fileWriter = new FileWriter(file, true);
-        BufferedWriter bWriter = new BufferedWriter(fileWriter);
+        FileWriter fileWriter = new FileWriter(file_b, true);
+        BufferedWriter bWriter_b = new BufferedWriter(fileWriter);
 
         int x = cells-1, y = 0;
 
@@ -170,8 +184,8 @@ class PathFinding {
                 }
             }
         }
-        bWriter.write(eq[0] + " " + eq[1]);
-        bWriter.newLine();
+        bWriter_b.write(eq[0] + " " + eq[1]);
+        bWriter_b.newLine();
 
         map[eq[0]][eq[1]].setType(5);
         canvas.repaint();
@@ -181,7 +195,7 @@ class PathFinding {
 
         first_b = eq[0];
         second_b = eq[1];
-        bWriter.close();
+        bWriter_b.close();
 
         //TimeUnit.MILLISECONDS.sleep(10);
     }
