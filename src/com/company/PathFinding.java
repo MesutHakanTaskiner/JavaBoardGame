@@ -3,8 +3,12 @@ package com.company;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
+import java.nio.file.Path;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
@@ -81,10 +85,15 @@ class PathFinding {
         initialize();
     }
 
-    public void start_game(){
+    public void start_game() throws InterruptedException, IOException {
+        File file = new File("Player_B.txt");
+        if (!file.exists()) {
+            file.createNewFile();
+        }
+
        do{
            //Player_A();
-           Player_B();
+           Player_B(file);
            golds -= 5;
        }while (golds != 0);
     }
@@ -119,7 +128,10 @@ class PathFinding {
             second_a = eq[1];
     }*/
 
-    public void Player_B(){
+    public void Player_B(File file) throws InterruptedException, IOException {
+
+        FileWriter fileWriter = new FileWriter(file, true);
+        BufferedWriter bWriter = new BufferedWriter(fileWriter);
 
         int x = cells-1, y = 0;
 
@@ -150,12 +162,20 @@ class PathFinding {
                 }
             }
         }
+        bWriter.write(eq[0] + " " + eq[1]);
+        bWriter.newLine();
+
         map[eq[0]][eq[1]].setType(5);
+        canvas.repaint();
         number_of_steps_b++;
         map[first_b][second_b].setType(3);
+        canvas.repaint();
 
         first_b = eq[0];
         second_b = eq[1];
+        bWriter.close();
+
+        //TimeUnit.MILLISECONDS.sleep(10);
     }
 
     // Random gold placement
@@ -293,8 +313,12 @@ class PathFinding {
         start.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                start_game();
-                Update();
+                try {
+                    start_game();
+                    //Update();
+                } catch (InterruptedException | IOException interruptedException) {
+                    interruptedException.printStackTrace();
+                }
             }
         });
 
