@@ -35,11 +35,15 @@ class PathFinding {
     public  int [] gold_x = new int[value];
     public  int [] gold_y = new int[value];
     public boolean control = true;
-    public int golds = 200;
+    public int golds_a = 200;
+    public int golds_b = 200;
+    public int golds_c = 200;
+    public int golds_d = 200;
     public int first_a = 0, second_a = 0;
     public int first_b = cells-1, second_b = 0;
     public int number_of_steps_a = 0, number_of_steps_b = 0, number_of_steps_c = 0, number_of_steps_d= 0;
     public ArrayList<Integer> random_control = new ArrayList<>();
+    public int [][] visible_golds = new int [cells][cells];
 
     //BOOLEANS
     private boolean solving = false;
@@ -57,7 +61,7 @@ class PathFinding {
     JLabel cellsL = new JLabel(cells + "x" + cells);
 
     //TEXT FIELD
-    JTextField players_gold = new JTextField(Integer.toString(golds));
+    JTextField players_gold = new JTextField(Integer.toString(golds_a));
 
     //BUTTONS
     JButton start = new JButton("Start Game");
@@ -94,13 +98,16 @@ class PathFinding {
        do{
            //Player_A();
            Player_B(file);
-           golds -= 5;
-       }while (golds != 0);
+           golds_b -= 5;
+       }while (golds_b != 0);
     }
 
     public void get_golds(){
         String text = players_gold.getText();
-        golds = Integer.parseInt(text);
+        golds_a = Integer.parseInt(text);
+        golds_b = Integer.parseInt(text);
+        golds_c = Integer.parseInt(text);
+        golds_d = Integer.parseInt(text);
     }
 
     /*public void Player_A(){
@@ -151,6 +158,7 @@ class PathFinding {
                         close_number = random_x;
                         eq[0] = map[x][y].x;
                         eq[1] = map[x][y].y;
+                        golds_b += visible_golds[eq[0]][eq[1]];
                         //System.out.println(eq[0] + " " + eq[1]);
                     }
                     else if (Math.abs(random_x - number) == proximity){
@@ -370,12 +378,12 @@ class PathFinding {
                             g.setColor(Color.WHITE);
                             g.setColor(Color.WHITE);
                             random = r.nextInt(20/5)*5 + 5;
-                            random_control.add(random);
+                            visible_golds[x][y] = random;
                             break;
                         case 2: // Gold Placement
                             g.setColor(Color.ORANGE);
                             random = r.nextInt(20/5)*5 + 5;
-                            random_control.add(random);
+                            visible_golds[x][y] = random;
                             break;
                         case 3: // Clear Map
                             g.setColor(Color.WHITE);
@@ -397,7 +405,7 @@ class PathFinding {
                         g.setColor(Color.BLUE);
                         g.drawRect(x * CSIZE, y * CSIZE, CSIZE, CSIZE);
 
-                    /*if (map[x][y].getType() == 1)
+                        /*if (map[x][y].getType() == 1)
                     {
                         g.setColor(Color.RED);
                         g.drawString(Integer.toString(random), x*CSIZE, y*CSIZE + 10);
@@ -431,6 +439,7 @@ class PathFinding {
             }
         }
     }
+
 
 
     public static class Node {
