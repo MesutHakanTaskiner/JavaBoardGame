@@ -298,7 +298,7 @@ class PathFinding {
             }
         });
 
-        start.addActionListener(new ActionListener() {
+        get_golds.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 get_golds();
