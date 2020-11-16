@@ -3,6 +3,10 @@ package com.company;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.Timer;
 import javax.swing.*;
@@ -144,19 +148,35 @@ class PathFinding {
             @Override
             public void run() {
                 if (a_golds > 0){
-                    player_a();
+                    try {
+                        player_a();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 if (b_golds > 0){
-                    player_b();
+                    try {
+                        player_b();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 if (c_golds > 0){
-                    player_c();
+                    try {
+                        player_c();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 if (d_golds > 0){
-                    player_d();
+                    try {
+                        player_d();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
                 if(d_golds < 1) {
                     a_steps_t.setText(Integer.toString(number_of_steps_a));
@@ -308,7 +328,13 @@ class PathFinding {
         return arr;
     }
 
-    public void player_a(){
+    public void player_a() throws IOException {
+        File file = new File("coordinates_a.txt");
+
+        if(!file.exists()){
+            file.createNewFile();
+        }
+
         a_golds -= 10;
         int[] arr = new int[4] ;
         //manhattan(b,n,4);
@@ -318,6 +344,13 @@ class PathFinding {
         b = arr[0];
         n = arr[1];
 
+        FileWriter fw = new FileWriter(file,true);
+        BufferedWriter bw = new BufferedWriter(fw);
+        bw.write(Integer.toString(arr[0]) + " ");
+        bw.write(Integer.toString(arr[1]));
+        bw.newLine();
+        bw.close();
+
         a_golds += arr[2];
         a_collected += arr[2];
         a_spent += 10;
@@ -326,7 +359,13 @@ class PathFinding {
         Update();
     }
 
-    public void player_b(){
+    public void player_b() throws IOException {
+        File file = new File("coordinates_b.txt");
+
+        if(!file.exists()){
+            file.createNewFile();
+        }
+
         b_golds -= 15;
 
         int d1 = 0, d2 = 0;
@@ -339,6 +378,13 @@ class PathFinding {
         map[first_b][second_b].setType(3);
         map[arr[0]][arr[1]].setType(5);
 
+        FileWriter fw = new FileWriter(file,true);
+        BufferedWriter bw = new BufferedWriter(fw);
+        bw.write(Integer.toString(arr[0]) + " ");
+        bw.write(Integer.toString(arr[1]));
+        bw.newLine();
+        bw.close();
+
         first_b = arr[0];
         second_b = arr[1];
 
@@ -350,7 +396,13 @@ class PathFinding {
         Update();
     }
 
-    public void player_c(){
+    public void player_c() throws IOException {
+        File file = new File("coordinates_c.txt");
+
+        if(!file.exists()){
+            file.createNewFile();
+        }
+
         c_golds -= 20;
 
         int[] arr = new int[3];
@@ -361,6 +413,13 @@ class PathFinding {
         c1 = arr[0];
         c2 = arr[1];
 
+        FileWriter fw = new FileWriter(file,true);
+        BufferedWriter bw = new BufferedWriter(fw);
+        bw.write(Integer.toString(arr[0]) + " ");
+        bw.write(Integer.toString(arr[1]));
+        bw.newLine();
+        bw.close();
+
         c_golds += arr[2];
         c_collected += arr[2];
         c_spent += 20;
@@ -369,7 +428,13 @@ class PathFinding {
         Update();
     }
 
-    public void player_d(){
+    public void player_d() throws IOException {
+        File file = new File("coordinates_d.txt");
+
+        if(!file.exists()){
+            file.createNewFile();
+        }
+
         d_golds -= 25;
         int[] arr = new int[3];
         arr = manhattan_a(d1, d2);
@@ -377,6 +442,13 @@ class PathFinding {
         map[arr[0]][arr[1]].setType(7);
         d1 = arr[0] ;
         d2 = arr[1] ;
+
+        FileWriter fw = new FileWriter(file,true);
+        BufferedWriter bw = new BufferedWriter(fw);
+        bw.write(Integer.toString(arr[0]) + " ");
+        bw.write(Integer.toString(arr[1]));
+        bw.newLine();
+        bw.close();
 
         d_golds += arr[2];
         d_collected += arr[2];
