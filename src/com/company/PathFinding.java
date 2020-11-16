@@ -40,12 +40,11 @@ class PathFinding {
     public static int b_golds = 200;
     public static int c_golds = 200;
     public static int d_golds = 200;
-    public int first_a = 0, second_a = 0;
-    public int b = 0, n = 0; // Player a current coordinate
-    public int first_b = cells-1, second_b = 0;  // Player b current coordinate
+    public int a1 = 0, a2 = 0; // Player a current coordinate
+    public int b1 = cells-1, b2 = 0;  // Player b current coordinate
     public int c1 = cells-1, c2 = cells-1;
     public int d1 = 0, d2 = cells-1;
-    public int number_of_steps_a = 0, number_of_steps_b = 0, number_of_steps_c = 0, number_of_steps_d= 0;
+    public int number_of_steps_a = 0, number_of_steps_b = 0, number_of_steps_c = 0, number_of_steps_d = 0;
     public ArrayList<Integer> random_control = new ArrayList<>();
     public int[][] visible_golds = new int[cells][cells];
     int a_collected = 0, b_collected = 0, c_collected = 0, d_collected = 0;
@@ -144,7 +143,7 @@ class PathFinding {
     public void start_game(){
 
         Timer myTimer = new Timer();
-        TimerTask gorev = new TimerTask(){
+        TimerTask task = new TimerTask(){
             @Override
             public void run() {
                 if (a_golds > 0){
@@ -205,7 +204,7 @@ class PathFinding {
             }
         };
 
-        myTimer.schedule(gorev,1,2000);
+        myTimer.schedule(task,1,2000);
     }
 
     public void get_golds(){
@@ -338,11 +337,11 @@ class PathFinding {
         a_golds -= 10;
         int[] arr = new int[4] ;
         //manhattan(b,n,4);
-        arr = manhattan_a(b, n);
-        map[b][n].setType(3);
+        arr = manhattan_a(a1, a2);
+        map[a1][a2].setType(3);
         map[arr[0]][arr[1]].setType(4);
-        b = arr[0];
-        n = arr[1];
+        a1 = arr[0];
+        a2 = arr[1];
 
         FileWriter fw = new FileWriter(file,true);
         BufferedWriter bw = new BufferedWriter(fw);
@@ -368,14 +367,11 @@ class PathFinding {
 
         b_golds -= 15;
 
-        int d1 = 0, d2 = 0;
-        int gold1 = 0, gold2 = 0;
-
         int[] arr;
 
-        arr = manhattan_b(first_b, second_b);
+        arr = manhattan_b(b1, b2);
 
-        map[first_b][second_b].setType(3);
+        map[b1][b2].setType(3);
         map[arr[0]][arr[1]].setType(5);
 
         FileWriter fw = new FileWriter(file,true);
@@ -385,8 +381,8 @@ class PathFinding {
         bw.newLine();
         bw.close();
 
-        first_b = arr[0];
-        second_b = arr[1];
+        b1 = arr[0];
+        b2 = arr[1];
 
         b_golds += arr[2];
         b_collected += arr[2];
@@ -481,11 +477,10 @@ class PathFinding {
 
         for(int i = 0; i < cells; i++) {
             for (int j = 0; j < cells; j++) {
-                if(map[i][j].getType() == 2){
+                if(map[i][j].getType() == 2)
                     visible_golds[i][j] = r.nextInt(20/5)*5 + 5;
-                }
                 else
-                    visible_golds[i][j] =0;
+                    visible_golds[i][j] = 0;
             }
         }
         unvisible_golds();
