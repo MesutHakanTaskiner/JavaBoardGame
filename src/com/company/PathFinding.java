@@ -46,9 +46,10 @@ class PathFinding {
     public int d1 = 0, d2 = cells-1;
     public int number_of_steps_a = 0, number_of_steps_b = 0, number_of_steps_c = 0, number_of_steps_d = 0;
     public ArrayList<Integer> random_control = new ArrayList<>();
-    public int[][] visible_golds = new int[cells][cells];
+    public int[][] visible_golds = new int[50][50];
     int a_collected = 0, b_collected = 0, c_collected = 0, d_collected = 0;
     int a_spent = 0, b_spent = 0, c_spent = 0, d_spent = 0;
+    public String game_winner;
 
     //BOOLEANS
     private boolean solving = false;
@@ -105,10 +106,13 @@ class PathFinding {
     JLabel b_spent2 = new JLabel( "B Spent gold" );
     JLabel c_spent2 = new JLabel( "C Spent gold" );
     JLabel d_spent2 = new JLabel( "D Spent gold" );
-    JLabel a_spent1 = new JLabel(  Integer.toString(a_spent));
+    JLabel a_spent1 = new JLabel( Integer.toString(a_spent));
     JLabel b_spent1 = new JLabel( Integer.toString(b_spent));
     JLabel c_spent1 = new JLabel( Integer.toString(c_spent));
     JLabel d_spent1 = new JLabel( Integer.toString(d_spent));
+
+    JLabel winner = new JLabel("Winner : ");
+    JLabel winner2 = new JLabel();
 
     //TEXT FIELD
     JTextField players_gold = new JTextField(Integer.toString(golds));
@@ -141,6 +145,7 @@ class PathFinding {
     }
 
     public void start_game(){
+
 
         Timer myTimer = new Timer();
         TimerTask task = new TimerTask(){
@@ -177,6 +182,7 @@ class PathFinding {
                         e.printStackTrace();
                     }
                 }
+
                 if(d_golds < 1) {
                     a_steps_t.setText(Integer.toString(number_of_steps_a));
                     b_steps_t.setText(Integer.toString(number_of_steps_b));
@@ -197,6 +203,30 @@ class PathFinding {
                     b_spent1.setText(Integer.toString(b_spent));
                     c_spent1.setText(Integer.toString(c_spent));
                     d_spent1.setText(Integer.toString(d_spent));
+
+                    if((a_golds > b_golds) && (a_golds > c_golds) && (a_golds > d_golds))
+                        game_winner = "Player A Won!";
+                    else if((b_golds > a_golds) && (b_golds > c_golds) && (b_golds > d_golds))
+                        game_winner = "Player B Won!";
+                    else if((c_golds > b_golds) && (c_golds > a_golds) && (c_golds > d_golds))
+                        game_winner = "Player C Won!";
+                    else if((d_golds > b_golds) && (d_golds > c_golds) && (d_golds > a_golds))
+                        game_winner = "Player D Won!";
+                    else if((a_golds == b_golds) && (a_golds > c_golds) && (a_golds > d_golds))
+                        game_winner = "Player A - B Won!";
+                    else if((a_golds == c_golds) && (a_golds > b_golds) && (a_golds > d_golds))
+                        game_winner = "Player A - C Won!";
+                    else if((a_golds == d_golds) && (a_golds > b_golds) && (a_golds > c_golds))
+                        game_winner = "Player A - D Won!";
+                    else if((b_golds == c_golds) && (b_golds > a_golds) && (b_golds > d_golds))
+                        game_winner = "Player B - C Won!";
+                    else if((b_golds == d_golds) && (b_golds > a_golds) && (b_golds > c_golds))
+                        game_winner = "Player B - D Won!";
+                    else if((c_golds == d_golds) && (c_golds > a_golds) && (c_golds > c_golds))
+                        game_winner = "Player C - D Won!";
+
+
+                    winner2.setText(game_winner);
 
                     initialize2();
                     myTimer.cancel();
@@ -644,6 +674,12 @@ class PathFinding {
         toolP2.add(c_spent1);
         d_spent1.setBounds(150,325, 100, 70);
         toolP2.add(d_spent1);
+        space += 40;
+
+        winner.setBounds(400,150, 100, 200);
+        toolP2.add(winner);
+        winner2.setBounds(500,150, 100, 200);
+        toolP2.add(winner2);
         space += 40;
 
         frame2.getContentPane().add(toolP2);
