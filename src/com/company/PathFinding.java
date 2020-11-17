@@ -46,10 +46,11 @@ class PathFinding {
     public int d1 = 0, d2 = cells-1;
     public int number_of_steps_a = 0, number_of_steps_b = 0, number_of_steps_c = 0, number_of_steps_d = 0;
     public ArrayList<Integer> random_control = new ArrayList<>();
-    public int[][] visible_golds = new int[50][50];
+    public int[][] visible_golds = new int[value][value];
     int a_collected = 0, b_collected = 0, c_collected = 0, d_collected = 0;
     int a_spent = 0, b_spent = 0, c_spent = 0, d_spent = 0;
     public String game_winner;
+    public int total = ((cells*cells)/5);
 
     //BOOLEANS
     private boolean solving = false;
@@ -146,14 +147,15 @@ class PathFinding {
 
     public void start_game(){
 
-
         Timer myTimer = new Timer();
         TimerTask task = new TimerTask(){
             @Override
             public void run() {
+
                 if (a_golds > 0){
                     try {
                         player_a();
+                        total--;
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -162,6 +164,7 @@ class PathFinding {
                 if (b_golds > 0){
                     try {
                         player_b();
+                        total--;
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -170,6 +173,7 @@ class PathFinding {
                 if (c_golds > 0){
                     try {
                         player_c();
+                        total--;
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -178,12 +182,14 @@ class PathFinding {
                 if (d_golds > 0){
                     try {
                         player_d();
+                        total--;
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
+                System.out.println(total);
 
-                if(d_golds < 1) {
+                if(total < 1) {
                     a_steps_t.setText(Integer.toString(number_of_steps_a));
                     b_steps_t.setText(Integer.toString(number_of_steps_b));
                     c_steps_t.setText(Integer.toString(number_of_steps_c));
@@ -225,7 +231,6 @@ class PathFinding {
                     else if((c_golds == d_golds) && (c_golds > a_golds) && (c_golds > c_golds))
                         game_winner = "Player C - D Won!";
 
-
                     winner2.setText(game_winner);
 
                     initialize2();
@@ -234,7 +239,7 @@ class PathFinding {
             }
         };
 
-        myTimer.schedule(task,1,2000);
+        myTimer.schedule(task,1,1000);
     }
 
     public void get_golds(){
@@ -520,6 +525,7 @@ class PathFinding {
     public void unvisible_golds() {
         int Random = 0, Old_random = 0;
         ArrayList<Integer> control = new ArrayList<Integer>();
+
 
         for(int i = 0; i < (cells*cells)/50; i++)
         {
