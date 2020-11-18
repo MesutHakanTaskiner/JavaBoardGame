@@ -23,7 +23,8 @@ class PathFinding {
 
     //GENERAL VARIABLES
     public static int value = 500;
-    public int cells = 20;
+    private int cells = 20;
+    public int cells2 = 0;
     public int startx = -1;
     public int starty = -1;
     public int finishx = -1;
@@ -31,7 +32,7 @@ class PathFinding {
     public final int WIDTH = 850;
     public final int HEIGHT = 650;
     public final int MSIZE = 600;
-    public int CSIZE = MSIZE/cells;
+    public int CSIZE = MSIZE/ getCells();
     public  int [] gold_x = new int[value];
     public  int [] gold_y = new int[value];
     public boolean control = true;
@@ -41,16 +42,16 @@ class PathFinding {
     public static int c_golds = 200;
     public static int d_golds = 200;
     public int a1 = 0, a2 = 0; // Player a current coordinate
-    public int b1 = cells-1, b2 = 0;  // Player b current coordinate
-    public int c1 = cells-1, c2 = cells-1;
-    public int d1 = 0, d2 = cells-1;
+    public int b1 = getCells() -1, b2 = 0;  // Player b current coordinate
+    public int c1 = getCells() -1, c2 = getCells() -1; // Player c current coordinate
+    public int d1 = 0, d2 = getCells() -1; // Player d current coordinate
     public int number_of_steps_a = 0, number_of_steps_b = 0, number_of_steps_c = 0, number_of_steps_d = 0;
     public ArrayList<Integer> random_control = new ArrayList<>();
     public int[][] visible_golds = new int[value][value];
     int a_collected = 0, b_collected = 0, c_collected = 0, d_collected = 0;
     int a_spent = 0, b_spent = 0, c_spent = 0, d_spent = 0;
     public String game_winner;
-    public int total = ((cells*cells)/5);
+    public int total = 0;
 
     //BOOLEANS
     private boolean solving = false;
@@ -65,8 +66,8 @@ class PathFinding {
 
     //LABELS initialize
     JLabel sizeL = new JLabel("Size:");
-    JLabel cellsL = new JLabel(cells + "x" + cells);
-    JLabel a_gold = new JLabel(  "A current gold" );
+    JLabel cellsL = new JLabel(getCells() + "x" + getCells());
+    JLabel a_gold = new JLabel( "A current gold" );
     JLabel b_gold = new JLabel( "B current gold" );
     JLabel c_gold = new JLabel( "C current gold" );
     JLabel d_gold = new JLabel( "D current gold" );
@@ -76,7 +77,7 @@ class PathFinding {
     JLabel d_gold_t = new JLabel(Integer.toString(d_golds));
 
     //LABELS Initialize2
-    JLabel a_steps = new JLabel(  "A Steps Number" );
+    JLabel a_steps = new JLabel( "A Steps Number" );
     JLabel b_steps = new JLabel( "B Steps Number" );
     JLabel c_steps = new JLabel( "C Steps Number" );
     JLabel d_steps = new JLabel( "D Steps Number" );
@@ -85,7 +86,7 @@ class PathFinding {
     JLabel c_steps_t = new JLabel(Integer.toString(number_of_steps_c));
     JLabel d_steps_t = new JLabel(Integer.toString(number_of_steps_d));
 
-    JLabel a_gold_last = new JLabel(  "A current gold" );
+    JLabel a_gold_last = new JLabel( "A current gold" );
     JLabel b_gold_last = new JLabel( "B current gold" );
     JLabel c_gold_last = new JLabel( "C current gold" );
     JLabel d_gold_last = new JLabel( "D current gold" );
@@ -94,7 +95,7 @@ class PathFinding {
     JLabel c_gold_last_t = new JLabel( Integer.toString(c_golds));
     JLabel d_gold_last_t = new JLabel( Integer.toString(d_golds));
 
-    JLabel a_collected2 = new JLabel(  "A collected gold" );
+    JLabel a_collected2 = new JLabel( "A collected gold" );
     JLabel b_collected2 = new JLabel( "B collected gold" );
     JLabel c_collected2 = new JLabel( "C collected gold" );
     JLabel d_collected2 = new JLabel( "D collected gold" );
@@ -103,7 +104,7 @@ class PathFinding {
     JLabel c_collected1 = new JLabel( Integer.toString(c_collected));
     JLabel d_collected1 = new JLabel( Integer.toString(d_collected));
 
-    JLabel a_spent2 = new JLabel(  "A Spent gold" );
+    JLabel a_spent2 = new JLabel( "A Spent gold" );
     JLabel b_spent2 = new JLabel( "B Spent gold" );
     JLabel c_spent2 = new JLabel( "C Spent gold" );
     JLabel d_spent2 = new JLabel( "D Spent gold" );
@@ -146,6 +147,13 @@ class PathFinding {
     }
 
     public void start_game(){
+        setCells(size.getValue()*10);
+        cells2 = getCells();
+        b1 = (cells2-1); b2 = 0;
+        c1 = (cells2-1); c2 = (cells2-1);
+        d1 = 0; d2 = (cells2-1);
+
+        total = ((cells2*cells2)/5);
 
         Timer myTimer = new Timer();
         TimerTask task = new TimerTask(){
@@ -187,7 +195,6 @@ class PathFinding {
                         e.printStackTrace();
                     }
                 }
-                System.out.println(total);
 
                 if(total < 1) {
                     a_steps_t.setText(Integer.toString(number_of_steps_a));
@@ -257,12 +264,12 @@ class PathFinding {
 
     public int[] manhattan_a(int b, int n){
         int distance = 0;
-        int temp = cells-1;
+        int temp = getCells() -1;
         int temp_x = 0, temp_y = 0;
         int[] arr = new int[4];
 
-        for (int x = 0; x < cells; x++) {
-            for (int y = 0; y < cells; y++) {
+        for (int x = 0; x < getCells(); x++) {
+            for (int y = 0; y < getCells(); y++) {
                 if (map[x][y].getType() == 2) {
                     distance = Math.abs(map[b][n].x - map[x][y].x) + Math.abs(map[b][n].y - map[x][y].y);
 
@@ -286,15 +293,15 @@ class PathFinding {
         int distance = 0;
         int cost = 2;
         int profit = 0;
-        int temp = cells-1;
+        int temp = getCells() -1;
         int temp_x = 0, temp_y = 0;
         int[] arr = new int[4];
 
         ArrayList<Integer> gain = new ArrayList<Integer>();
         gain.add(0);
 
-        for (int x = 0; x < cells; x++) {
-            for (int y = 0; y < cells; y++) {
+        for (int x = 0; x < getCells(); x++) {
+            for (int y = 0; y < getCells(); y++) {
                 if (map[x][y].getType() == 2) {
                     distance = Math.abs(map[b][n].x - map[x][y].x) + Math.abs(map[b][n].y - map[x][y].y);
                     temp = cost * distance;
@@ -320,16 +327,16 @@ class PathFinding {
 
     public int[] manhattan_c(int b, int n){
         int distance = 0;
-        int temp = cells-1;
+        int temp = getCells() -1;
         int temp_x = 0, temp_y = 0;
         int u_distance = 0;
-        int u_temp = cells-1;
+        int u_temp = getCells() -1;
         int u_temp_x = 0, u_temp_y = 0;
 
         int[] arr = new int[4];
 
-        for (int x = 0; x < cells; x++) {
-            for (int y = 0; y < cells; y++) {
+        for (int x = 0; x < getCells(); x++) {
+            for (int y = 0; y < getCells(); y++) {
                 if (map[x][y].getType() == 2) {
                     distance = Math.abs(map[b][n].x - map[x][y].x) + Math.abs(map[b][n].y - map[x][y].y);
 
@@ -373,8 +380,10 @@ class PathFinding {
         int[] arr = new int[4] ;
         //manhattan(b,n,4);
         arr = manhattan_a(a1, a2);
+
         map[a1][a2].setType(3);
         map[arr[0]][arr[1]].setType(4);
+
         a1 = arr[0];
         a2 = arr[1];
 
@@ -439,8 +448,10 @@ class PathFinding {
         int[] arr = new int[3];
 
         arr = manhattan_c(c1, c2);
+
         map[c1][c2].setType(3);
         map[arr[0]][arr[1]].setType(6);
+
         c1 = arr[0];
         c2 = arr[1];
 
@@ -469,8 +480,10 @@ class PathFinding {
         d_golds -= 25;
         int[] arr = new int[3];
         arr = manhattan_a(d1, d2);
+
         map[d1][d2].setType(3);
         map[arr[0]][arr[1]].setType(7);
+
         d1 = arr[0] ;
         d2 = arr[1] ;
 
@@ -493,16 +506,16 @@ class PathFinding {
     public void visible_golds() {
         clearMap();	// CREATE CLEAR MAP TO START
 
-        for(int i = 0; i < (cells*cells)/5; i++) {
+        for(int i = 0; i < (getCells() * getCells())/5; i++) {
             int x = 0;
             int y = 0;
             do {
-                x = r.nextInt(cells);
-                y = r.nextInt(cells);
+                x = r.nextInt(getCells());
+                y = r.nextInt(getCells());
 
                 //System.out.println(x + " " + y); // Manuel Debug
 
-            } while(map[x][y].getType() == 2 || ((x == 0 && y == 0) || (x == (cells - 1) && y == 0) || (x == 0 && y == (cells - 1)) || (x == (cells - 1) && y == (cells - 1))));
+            } while(map[x][y].getType() == 2 || ((x == 0 && y == 0) || (x == (getCells() - 1) && y == 0) || (x == 0 && y == (getCells() - 1)) || (x == (getCells() - 1) && y == (getCells() - 1))));
 
             map[x][y].setType(2);
 
@@ -510,8 +523,8 @@ class PathFinding {
             gold_y[i] = map[x][y].y;
         }
 
-        for(int i = 0; i < cells; i++) {
-            for (int j = 0; j < cells; j++) {
+        for(int i = 0; i < getCells(); i++) {
+            for (int j = 0; j < getCells(); j++) {
                 if(map[i][j].getType() == 2)
                     visible_golds[i][j] = r.nextInt(20/5)*5 + 5;
                 else
@@ -527,10 +540,10 @@ class PathFinding {
         ArrayList<Integer> control = new ArrayList<Integer>();
 
 
-        for(int i = 0; i < (cells*cells)/50; i++)
+        for(int i = 0; i < (getCells() * getCells())/50; i++)
         {
             while (control.contains(Random)){
-                Random = r.nextInt(cells);
+                Random = r.nextInt(getCells());
             }
             if(control.contains(Random)){
                 //System.out.println("if" + " " + Random); // Manuel Debug
@@ -545,8 +558,8 @@ class PathFinding {
             Random = 0;
         }
 
-        for(int i = 0; i < cells; i++) {
-            for (int j = 0; j < cells; j++) {
+        for(int i = 0; i < getCells(); i++) {
+            for (int j = 0; j < getCells(); j++) {
                 if(map[i][j].getType() == 1){
                     visible_golds[i][j] = r.nextInt(20/5)*5 + 5;
                 }
@@ -557,9 +570,9 @@ class PathFinding {
 
     public void player_placement(){
         map[0][0].setType(4); // A
-        map[cells-1][0].setType(5); // B
-        map[cells-1][cells-1].setType(6); // C
-        map[0][cells-1].setType(7); // D
+        map[getCells() -1][0].setType(5); // B
+        map[getCells() -1][getCells() -1].setType(6); // C
+        map[0][getCells() -1].setType(7); // D
     }
 
     // Clear Map
@@ -569,9 +582,9 @@ class PathFinding {
         finishy = -1;
         startx = -1;
         starty = -1;
-        map = new Node[cells][cells];	// CREATE NEW MAP OF NODES
-        for(int x = 0; x < cells; x++) {
-            for(int y = 0; y < cells; y++) {
+        map = new Node[getCells()][getCells()];	// CREATE NEW MAP OF NODES
+        for(int x = 0; x < getCells(); x++) {
+            for(int y = 0; y < getCells(); y++) {
                 map[x][y] = new Node(3, x, y);	//SET ALL NODES TO EMPTY
             }
         }
@@ -579,9 +592,9 @@ class PathFinding {
 
     // UPDATE ELEMENTS OF THE GUI
     public void Update() {
-        CSIZE = MSIZE/cells;
+        CSIZE = MSIZE/ getCells();
         canvas.repaint();
-        cellsL.setText(cells + "x" + cells);
+        cellsL.setText(getCells() + "x" + getCells());
     }
 
     private void initialize2() {
@@ -800,11 +813,19 @@ class PathFinding {
         size.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                cells = size.getValue()*10;
+                setCells(size.getValue()*10);
                 clearMap();
                 Update();
             }
         });
+    }
+
+    public int getCells() {
+        return cells;
+    }
+
+    public void setCells(int cells) {
+        this.cells = cells;
     }
 
     // MAP CLASS
@@ -814,8 +835,8 @@ class PathFinding {
             int random = 0;
 
             super.paintComponent(g);  // REPAINT
-            for (int x = 0; x < cells; x++) {    // PAINT EACH NODE IN THE GRID
-                for (int y = 0; y < cells; y++) {
+            for (int x = 0; x < getCells(); x++) {    // PAINT EACH NODE IN THE GRID
+                for (int y = 0; y < getCells(); y++) {
                     //System.out.println(map[x][y].getType()); // Manuel Debug
                     switch(map[x][y].getType()) {
                         case 1: // unvisible Gold Placement
