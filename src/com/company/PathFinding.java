@@ -982,31 +982,20 @@ class PathFinding {
 
     public static class Node {
         public int cellType = 0;
-        public int hops;
         public int x;
         public int y;
-        public int lastX;
-        public int lastY;
-        public double dToEnd = 0;
 
         public Node(int type, int x, int y) {	//CONSTRUCTOR
             cellType = type;
             this.x = x;
             this.y = y;
-            hops = -1;
         }
 
         //GET METHODS
-        public int getX() {return x;}
-        public int getY() {return y;}
-        public int getLastX() {return lastX;}
-        public int getLastY() {return lastY;}
         public int getType() {return cellType;}
-        public int getHops() {return hops;}
 
         //SET METHODS
         public void setType(int type) {cellType = type;}
-        public void setLastNode(int x, int y) {lastX = x; lastY = y;}
-        public void setHops(int hops) {this.hops = hops;}
+
     }
 }
