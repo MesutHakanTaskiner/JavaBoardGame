@@ -166,7 +166,7 @@ class PathFinding {
         c1 = (cells2-1); c2 = (cells2-1);
         d1 = 0; d2 = (cells2-1);
 
-        total = ((cells2*cells2)/5);
+        total = ((cells2*cells2)/5) - ((cells2*cells2)/50);
 
         File file_a = new File("coordinates_a.txt");
 
@@ -272,7 +272,7 @@ class PathFinding {
                         game_winner = "Player B - C Won!";
                     else if((b_golds == d_golds) && (b_golds > a_golds) && (b_golds > c_golds))
                         game_winner = "Player B - D Won!";
-                    else if((c_golds == d_golds) && (c_golds > a_golds) && (c_golds > c_golds))
+                    else if((c_golds == d_golds) && (c_golds > a_golds) && (c_golds > b_golds))
                         game_winner = "Player C - D Won!";
 
                     winner2.setText(game_winner);
@@ -348,7 +348,7 @@ class PathFinding {
         int[] arr = new int[4];
 
         ArrayList<Integer> gain = new ArrayList<Integer>();
-        gain.add(0);
+        gain.add(-30);
 
         for (int x = 0; x < getCells(); x++) {
             for (int y = 0; y < getCells(); y++) {
