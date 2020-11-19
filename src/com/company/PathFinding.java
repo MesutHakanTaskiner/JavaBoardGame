@@ -114,7 +114,7 @@ class PathFinding {
     JLabel c_spent1 = new JLabel( Integer.toString(c_spent));
     JLabel d_spent1 = new JLabel( Integer.toString(d_spent));
 
-    JLabel Information = new JLabel("Target Definition + Move Cost");
+    JLabel Information = new JLabel("Target Setting And Movement Cost");
 
     JLabel required_gold_a2 = new JLabel("A");
     JLabel required_gold_b2 = new JLabel("B");
@@ -764,7 +764,7 @@ class PathFinding {
         toolP.add(players_gold);
         space += buff;
 
-        Information.setBounds(30, 190,500,25);
+        Information.setBounds(8, 190,500,25);
         toolP.add(Information);
 
         required_gold_a2.setBounds(62, 210,50,25);
