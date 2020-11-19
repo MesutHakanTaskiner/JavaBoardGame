@@ -168,6 +168,30 @@ class PathFinding {
 
         total = ((cells2*cells2)/5);
 
+        File file_a = new File("coordinates_a.txt");
+
+        if(file_a.exists()){
+            file_a.delete();
+        }
+
+        File file_b = new File("coordinates_b.txt");
+
+        if(file_b.exists()){
+            file_b.delete();
+        }
+
+        File file_c = new File("coordinates_c.txt");
+
+        if(file_c.exists()){
+            file_c.delete();
+        }
+
+        File file_d = new File("coordinates_d.txt");
+
+        if(file_d.exists()){
+            file_d.delete();
+        }
+
         Timer myTimer = new Timer();
         TimerTask task = new TimerTask(){
             @Override
@@ -957,7 +981,6 @@ class PathFinding {
     }
 
     public static class Node {
-        // 0 = start, 1 = finish, 2 = wall, 3 = empty, 4 = checked, 5 = finalpath
         public int cellType = 0;
         public int hops;
         public int x;
