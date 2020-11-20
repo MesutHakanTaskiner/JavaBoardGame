@@ -1,5 +1,3 @@
-package com.company;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,10 +23,6 @@ class PathFinding {
     public static int value = 500;
     private int cells = 20;
     public int cells2 = 0;
-    public int startx = -1;
-    public int starty = -1;
-    public int finishx = -1;
-    public int finishy = -1;
     public final int WIDTH = 850;
     public final int HEIGHT = 650;
     public final int MSIZE = 600;
@@ -54,16 +48,12 @@ class PathFinding {
     public int total = 0;
     public int golds_a = -10, golds_b = -15, golds_c = -20, golds_d = -25;
 
-    //BOOLEANS
-    private boolean solving = false;
-
     //UTIL
     Node[][] map;
     Random r = new Random();
 
     //Slider Size
     JSlider size = new JSlider(1,5,2);
-    JSlider starting_gold = new JSlider(1,5,1);
 
     //LABELS initialize
     JLabel sizeL = new JLabel("Size:");
@@ -168,25 +158,25 @@ class PathFinding {
 
         total = ((cells2*cells2)/5);
 
-        File file_a = new File("coordinates_a.txt");
+        File file_a = new File("Coordinates_A.txt");
 
         if(file_a.exists()){
             file_a.delete();
         }
 
-        File file_b = new File("coordinates_b.txt");
+        File file_b = new File("Coordinates_B.txt");
 
         if(file_b.exists()){
             file_b.delete();
         }
 
-        File file_c = new File("coordinates_c.txt");
+        File file_c = new File("Coordinates_C.txt");
 
         if(file_c.exists()){
             file_c.delete();
         }
 
-        File file_d = new File("coordinates_d.txt");
+        File file_d = new File("Coordinates_D.txt");
 
         if(file_d.exists()){
             file_d.delete();
@@ -233,26 +223,47 @@ class PathFinding {
                     }
                 }
 
-                if(total < 1 || (a_golds < 0 && b_golds < 0 && c_golds < 0 && d_golds < 0)) {
+                if(total < 1 || (a_golds <= 0 && b_golds <= 0 && c_golds <= 0 && d_golds <= 0)) {
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     a_steps_t.setText(Integer.toString(number_of_steps_a));
                     b_steps_t.setText(Integer.toString(number_of_steps_b));
                     c_steps_t.setText(Integer.toString(number_of_steps_c));
                     d_steps_t.setText(Integer.toString(number_of_steps_d));
 
-                    a_gold_last_t.setText(Integer.toString(a_golds));
-                    b_gold_last_t.setText(Integer.toString(b_golds));
-                    c_gold_last_t.setText(Integer.toString(c_golds));
-                    d_gold_last_t.setText(Integer.toString(d_golds));
+                    if(a_golds < 0)
+                        a_gold_last_t.setText(Integer.toString(0));
+                    else
+                        a_gold_last_t.setText(Integer.toString(a_golds));
+
+                    if(b_golds < 0)
+                        b_gold_last_t.setText(Integer.toString(0));
+                    else
+                        b_gold_last_t.setText(Integer.toString(b_golds));
+
+                    if(c_golds < 0)
+                        c_gold_last_t.setText(Integer.toString(0));
+                    else
+                        c_gold_last_t.setText(Integer.toString(c_golds));
+
+                    if(d_golds < 0)
+                        d_gold_last_t.setText(Integer.toString(0));
+                    else
+                        d_gold_last_t.setText(Integer.toString(d_golds));
+
 
                     a_collected1.setText(Integer.toString(a_collected));
                     b_collected1.setText(Integer.toString(b_collected));
                     c_collected1.setText(Integer.toString(c_collected));
                     d_collected1.setText(Integer.toString(d_collected));
 
-                    a_spent1.setText(Integer.toString(a_spent));
-                    b_spent1.setText(Integer.toString(b_spent));
-                    c_spent1.setText(Integer.toString(c_spent));
-                    d_spent1.setText(Integer.toString(d_spent));
+                    a_spent1.setText(Integer.toString(-a_spent));
+                    b_spent1.setText(Integer.toString(-b_spent));
+                    c_spent1.setText(Integer.toString(-c_spent));
+                    d_spent1.setText(Integer.toString(-d_spent));
 
                     if((a_golds > b_golds) && (a_golds > c_golds) && (a_golds > d_golds))
                         game_winner = "Player A Won!";
@@ -282,8 +293,7 @@ class PathFinding {
                 }
             }
         };
-
-        myTimer.schedule(task,1,1000);
+        myTimer.schedule(task,1,2000);
     }
 
     public void get_golds(){
@@ -318,6 +328,8 @@ class PathFinding {
         int temp_x = 0, temp_y = 0;
         int[] arr = new int[4];
 
+        int  location = 0, location2 = 0;
+
         for (int x = 0; x < getCells(); x++) {
             for (int y = 0; y < getCells(); y++) {
                 if (map[x][y].getType() == 2 || map[x][y].getType() == 9) {
@@ -327,14 +339,15 @@ class PathFinding {
                         temp = distance;
                         temp_x = map[x][y].x;
                         temp_y = map[x][y].y;
+                        arr[3] = distance;
                     }
                 }
             }
         }
+
         arr[0] = map[temp_x][temp_y].x;
         arr[1] = map[temp_x][temp_y].y;
         arr[2] = visible_golds[temp_x][temp_y];
-        arr[3] = temp;
 
         return arr;
     }
@@ -343,24 +356,25 @@ class PathFinding {
         int distance = 0;
         int cost = 2;
         int profit = 0;
-        int temp = getCells() -1;
+        int temp = getCells() - 1;
         int temp_x = 0, temp_y = 0;
         int[] arr = new int[4];
 
         ArrayList<Integer> gain = new ArrayList<Integer>();
-        gain.add(-30);
+        gain.add(-100);
 
         for (int x = 0; x < getCells(); x++) {
             for (int y = 0; y < getCells(); y++) {
                 if (map[x][y].getType() == 2 || map[x][y].getType() == 9) {
                     distance = Math.abs(map[b][n].x - map[x][y].x) + Math.abs(map[b][n].y - map[x][y].y);
-                    temp = cost * distance;
-                    profit = visible_golds[x][y] - temp;
+                    temp = golds_b * (distance/3);
+                    profit = visible_golds[x][y] + temp;
 
                     if(profit > Collections.max(gain)){
                         gain.add(profit);
                         temp_x = map[x][y].x;
                         temp_y = map[x][y].y;
+                        arr[3] = distance;
                     }
                 }
             }
@@ -369,7 +383,6 @@ class PathFinding {
         arr[0] = map[temp_x][temp_y].x;
         arr[1] = map[temp_x][temp_y].y;
         arr[2] = visible_golds[temp_x][temp_y];
-        arr[3] = temp;
 
         gain.clear();
         return arr;
@@ -394,6 +407,7 @@ class PathFinding {
                         temp = distance;
                         temp_x = map[x][y].x;
                         temp_y = map[x][y].y;
+                        arr[3] = distance;
                     }
                 }
 
@@ -414,25 +428,31 @@ class PathFinding {
         arr[0] = map[temp_x][temp_y].x;
         arr[1] = map[temp_x][temp_y].y;
         arr[2] = visible_golds[temp_x][temp_y];
-        arr[3] = temp;
 
         return arr;
     }
 
     public void player_a() throws IOException {
-        File file = new File("coordinates_a.txt");
+        File file = new File("Coordinates_A.txt");
 
         if(!file.exists()){
             file.createNewFile();
         }
 
         int[] arr = new int[4] ;
-        //manhattan(b,n,4);
         arr = manhattan_a(a1, a2);
 
-        a_golds += golds_a;
         map[a1][a2].setType(3);
         map[arr[0]][arr[1]].setType(4);
+
+        if(arr[3]%3 == 0){
+            a_golds += (golds_a * arr[3]/3);
+            a_spent += (golds_a * arr[3]/3);
+        }
+        else{
+            a_golds += (golds_a * arr[3]/3) + golds_a;
+            a_spent += (golds_a * arr[3]/3) + golds_a;
+        }
 
         a1 = arr[0];
         a2 = arr[1];
@@ -446,14 +466,13 @@ class PathFinding {
 
         a_golds += arr[2];
         a_collected += arr[2];
-        a_spent += 10;
         a_gold_t.setText(Integer.toString(a_golds));
-        number_of_steps_a++;
+        number_of_steps_a += arr[3];
         Update();
     }
 
     public void player_b() throws IOException {
-        File file = new File("coordinates_b.txt");
+        File file = new File("Coordinates_B.txt");
 
         if(!file.exists()){
             file.createNewFile();
@@ -461,11 +480,19 @@ class PathFinding {
 
         int[] arr;
 
-        b_golds += golds_b;
         arr = manhattan_b(b1, b2);
 
         map[b1][b2].setType(3);
         map[arr[0]][arr[1]].setType(5);
+
+        if(arr[3]%3 == 0){
+            b_golds += (golds_b * arr[3]/3);
+            b_spent += (golds_b * arr[3]/3);
+        }
+        else{
+            b_golds += (golds_b * arr[3]/3) + golds_b;
+            b_spent += (golds_b * arr[3]/3) + golds_b;
+        }
 
         FileWriter fw = new FileWriter(file,true);
         BufferedWriter bw = new BufferedWriter(fw);
@@ -479,14 +506,13 @@ class PathFinding {
 
         b_golds += arr[2];
         b_collected += arr[2];
-        b_spent += 15;
         b_gold_t.setText(Integer.toString(b_golds));
-        number_of_steps_b++;
+        number_of_steps_b += arr[3];
         Update();
     }
 
     public void player_c() throws IOException {
-        File file = new File("coordinates_c.txt");
+        File file = new File("Coordinates_C.txt");
 
         if(!file.exists()){
             file.createNewFile();
@@ -494,11 +520,19 @@ class PathFinding {
 
         int[] arr = new int[3];
 
-        c_golds += golds_c;
         arr = manhattan_c(c1, c2);
 
         map[c1][c2].setType(3);
         map[arr[0]][arr[1]].setType(6);
+
+        if(arr[3]%3 == 0){
+            c_golds += (golds_c * arr[3]/3);
+            c_spent += (golds_c * arr[3]/3);
+        }
+        else{
+            c_golds += (golds_c * arr[3]/3) + golds_c;
+            c_spent += (golds_c * arr[3]/3) + golds_c;
+        }
 
         c1 = arr[0];
         c2 = arr[1];
@@ -512,26 +546,32 @@ class PathFinding {
 
         c_golds += arr[2];
         c_collected += arr[2];
-        c_spent += 20;
         c_gold_t.setText(Integer.toString(c_golds));
-        number_of_steps_c++;
+        number_of_steps_c += arr[3];
         Update();
     }
 
     public void player_d() throws IOException {
-        File file = new File("coordinates_d.txt");
+        File file = new File("Coordinates_D.txt");
 
         if(!file.exists()){
             file.createNewFile();
         }
 
         int[] arr = new int[3];
-        arr = manhattan_a(d1, d2);
-
-        d_golds += golds_d;
+        arr = manhattan_b(d1, d2);
 
         map[d1][d2].setType(3);
         map[arr[0]][arr[1]].setType(7);
+
+        if(arr[3]%3 == 0){
+            d_golds += (golds_d * arr[3]/3);
+            d_spent += (golds_d * arr[3]/3);
+        }
+        else{
+            d_golds += (golds_d * arr[3]/3) + golds_d;
+            d_spent += (golds_d * arr[3]/3) + golds_d;
+        }
 
         d1 = arr[0] ;
         d2 = arr[1] ;
@@ -545,9 +585,8 @@ class PathFinding {
 
         d_golds += arr[2];
         d_collected += arr[2];
-        d_spent += 25;
         d_gold_t.setText(Integer.toString(d_golds));
-        number_of_steps_d++;
+        number_of_steps_d += arr[3];
         Update();
     }
 
@@ -573,6 +612,7 @@ class PathFinding {
 
             visible_golds[x][y] = r.nextInt(20/5)*5 + 5;
         }
+
         unvisible_golds();
         player_placement();
     }
@@ -580,7 +620,6 @@ class PathFinding {
     public void unvisible_golds() {
         int Random = 0, Old_random = 0;
         ArrayList<Integer> control = new ArrayList<Integer>();
-
 
         for(int i = 0; i < (getCells() * getCells())/50; i++)
         {
@@ -591,7 +630,6 @@ class PathFinding {
                 //System.out.println("if" + " " + Random); // Manual Debug
             }
             else {
-                //System.out.println("else" + " " + Random); // Manual Debug
                 map[gold_x[Random]][gold_y[Random]].setType(1);
                 visible_golds[gold_x[Random]][gold_y[Random]] = r.nextInt(20/5)*5 + 5;
             }
@@ -599,6 +637,7 @@ class PathFinding {
             control.add(Random);
             Random = 0;
         }
+
         control.clear();
     }
 
@@ -612,10 +651,6 @@ class PathFinding {
     // Clear Map
     public void clearMap() {
         control = true;
-        finishx = 0;  // RESET THE START AND FINISH
-        finishy = -1;
-        startx = -1;
-        starty = -1;
         map = new Node[getCells()][getCells()];	// CREATE NEW MAP OF NODES
         for(int x = 0; x < getCells(); x++) {
             for(int y = 0; y < getCells(); y++) {
@@ -731,9 +766,8 @@ class PathFinding {
 
         winner.setBounds(400,150, 100, 200);
         toolP2.add(winner);
-        winner2.setBounds(500,150, 120, 200);
+        winner2.setBounds(450,150, 120, 200);
         toolP2.add(winner2);
-        space += 40;
 
         frame2.getContentPane().add(toolP2);
     }
@@ -796,19 +830,8 @@ class PathFinding {
         required_gold_d.setBounds(110, 280,50,25);
         toolP.add(required_gold_d);
 
-        a_gold_t.setBounds(100,380, 100, 25);
-        toolP.add(a_gold_t);
-        b_gold_t.setBounds(100,410, 100, 25);
-        toolP.add(b_gold_t);
-        c_gold_t.setBounds(100,440, 100, 25);
-        toolP.add(c_gold_t);
-        d_gold_t.setBounds(100,470, 100, 25);
-        toolP.add(d_gold_t);
-        space += 40;
-
         get_golds.setBounds(40, 310, 120, 25);
         toolP.add(get_golds);
-        space += 40;
 
         sizeL.setBounds(15, 340,40,25);
         toolP.add(sizeL);
@@ -826,7 +849,15 @@ class PathFinding {
         toolP.add(c_gold);
         d_gold.setBounds(10,470,90,25);
         toolP.add(d_gold);
-        space += buff;
+
+        a_gold_t.setBounds(100,380, 100, 25);
+        toolP.add(a_gold_t);
+        b_gold_t.setBounds(100,410, 100, 25);
+        toolP.add(b_gold_t);
+        c_gold_t.setBounds(100,440, 100, 25);
+        toolP.add(c_gold_t);
+        d_gold_t.setBounds(100,470, 100, 25);
+        toolP.add(d_gold_t);
 
         frame.getContentPane().add(toolP);
 
@@ -890,7 +921,7 @@ class PathFinding {
             super.paintComponent(g);  // REPAINT
             for (int x = 0; x < getCells(); x++) {    // PAINT EACH NODE IN THE GRID
                 for (int y = 0; y < getCells(); y++) {
-                    //System.out.println(map[x][y].getType()); // Manuel Debug
+                    //System.out.println(map[x][y].getType()); // Manual Debug
                     switch(map[x][y].getType()) {
                         case 1: // unvisible Gold Placement
                             g.setColor(Color.WHITE);
@@ -961,7 +992,8 @@ class PathFinding {
         public int x;
         public int y;
 
-        public Node(int type, int x, int y) {	//CONSTRUCTOR
+        // CONSTRUCTOR
+        public Node(int type, int x, int y) {
             cellType = type;
             this.x = x;
             this.y = y;
@@ -972,6 +1004,5 @@ class PathFinding {
 
         //SET METHODS
         public void setType(int type) {cellType = type;}
-
     }
 }
