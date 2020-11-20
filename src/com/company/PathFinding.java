@@ -166,7 +166,7 @@ class PathFinding {
         c1 = (cells2-1); c2 = (cells2-1);
         d1 = 0; d2 = (cells2-1);
 
-        total = ((cells2*cells2)/5) - ((cells2*cells2)/50);
+        total = ((cells2*cells2)/5);
 
         File file_a = new File("coordinates_a.txt");
 
@@ -320,7 +320,7 @@ class PathFinding {
 
         for (int x = 0; x < getCells(); x++) {
             for (int y = 0; y < getCells(); y++) {
-                if (map[x][y].getType() == 2) {
+                if (map[x][y].getType() == 2 || map[x][y].getType() == 9) {
                     distance = Math.abs(map[b][n].x - map[x][y].x) + Math.abs(map[b][n].y - map[x][y].y);
 
                     if(distance < temp){
@@ -352,7 +352,7 @@ class PathFinding {
 
         for (int x = 0; x < getCells(); x++) {
             for (int y = 0; y < getCells(); y++) {
-                if (map[x][y].getType() == 2) {
+                if (map[x][y].getType() == 2 || map[x][y].getType() == 9) {
                     distance = Math.abs(map[b][n].x - map[x][y].x) + Math.abs(map[b][n].y - map[x][y].y);
                     temp = cost * distance;
                     profit = visible_golds[x][y] - temp;
@@ -387,7 +387,7 @@ class PathFinding {
 
         for (int x = 0; x < getCells(); x++) {
             for (int y = 0; y < getCells(); y++) {
-                if (map[x][y].getType() == 2) {
+                if (map[x][y].getType() == 2 || map[x][y].getType() == 9) {
                     distance = Math.abs(map[b][n].x - map[x][y].x) + Math.abs(map[b][n].y - map[x][y].y);
 
                     if(distance < temp){
@@ -562,7 +562,7 @@ class PathFinding {
                 x = r.nextInt(getCells());
                 y = r.nextInt(getCells());
 
-                //System.out.println(x + " " + y); // Manuel Debug
+                //System.out.println(x + " " + y); // Manual Debug
 
             } while(map[x][y].getType() == 2 || ((x == 0 && y == 0) || (x == (getCells() - 1) && y == 0) || (x == 0 && y == (getCells() - 1)) || (x == (getCells() - 1) && y == (getCells() - 1))));
 
@@ -570,15 +570,8 @@ class PathFinding {
 
             gold_x[i] = map[x][y].x;
             gold_y[i] = map[x][y].y;
-        }
 
-        for(int i = 0; i < getCells(); i++) {
-            for (int j = 0; j < getCells(); j++) {
-                if(map[i][j].getType() == 2)
-                    visible_golds[i][j] = r.nextInt(20/5)*5 + 5;
-                else
-                    visible_golds[i][j] = 0;
-            }
+            visible_golds[x][y] = r.nextInt(20/5)*5 + 5;
         }
         unvisible_golds();
         player_placement();
@@ -595,24 +588,16 @@ class PathFinding {
                 Random = r.nextInt(getCells());
             }
             if(control.contains(Random)){
-                //System.out.println("if" + " " + Random); // Manuel Debug
+                //System.out.println("if" + " " + Random); // Manual Debug
             }
             else {
-                //System.out.println("else" + " " + Random); // Manuel Debug
+                //System.out.println("else" + " " + Random); // Manual Debug
                 map[gold_x[Random]][gold_y[Random]].setType(1);
+                visible_golds[gold_x[Random]][gold_y[Random]] = r.nextInt(20/5)*5 + 5;
             }
 
-            //System.out.println(gold_x[Random] + " " + gold_y[Random]); // Manuel Debug
             control.add(Random);
             Random = 0;
-        }
-
-        for(int i = 0; i < getCells(); i++) {
-            for (int j = 0; j < getCells(); j++) {
-                if(map[i][j].getType() == 1){
-                    visible_golds[i][j] = r.nextInt(20/5)*5 + 5;
-                }
-            }
         }
         control.clear();
     }
@@ -746,7 +731,7 @@ class PathFinding {
 
         winner.setBounds(400,150, 100, 200);
         toolP2.add(winner);
-        winner2.setBounds(500,150, 100, 200);
+        winner2.setBounds(500,150, 120, 200);
         toolP2.add(winner2);
         space += 40;
 
@@ -902,8 +887,6 @@ class PathFinding {
     class Map extends JPanel {
 
         public void paintComponent(Graphics g) {
-            int random = 0;
-
             super.paintComponent(g);  // REPAINT
             for (int x = 0; x < getCells(); x++) {    // PAINT EACH NODE IN THE GRID
                 for (int y = 0; y < getCells(); y++) {
@@ -911,11 +894,9 @@ class PathFinding {
                     switch(map[x][y].getType()) {
                         case 1: // unvisible Gold Placement
                             g.setColor(Color.WHITE);
-                            random = visible_golds[x][y] ;
                             break;
                         case 2: // Gold Placement
                             g.setColor(Color.ORANGE);
-                            random = visible_golds[x][y] ;
                             break;
                         case 3: // Clear Map
                             g.setColor(Color.WHITE);
@@ -932,11 +913,6 @@ class PathFinding {
                         case 7: // PLAYER D
                             g.setColor(Color.CYAN);
                             break;
-                        case 8:
-                            if(map[x][y].getType() == 1){
-                                g.setColor(Color.RED);
-                                g.drawString(Integer.toString(random), x*CSIZE, y*CSIZE + 10);}
-                            break;
                         case 9:
                             g.setColor(Color.WHITE);
                             break;
@@ -948,12 +924,12 @@ class PathFinding {
                     if (map[x][y].getType() == 9)
                     {
                         g.setColor(Color.RED);
-                        g.drawString(Integer.toString(random), x*CSIZE, y*CSIZE + 10);
+                        g.drawString(Integer.toString(visible_golds[x][y]), x*CSIZE, y*CSIZE + 10);
                     }
 
                     if (map[x][y].getType() == 2) {
                         g.setColor(Color.BLACK);
-                        g.drawString(Integer.toString(random), x * CSIZE, y * CSIZE + 10);
+                        g.drawString(Integer.toString(visible_golds[x][y]), x * CSIZE, y * CSIZE + 10);
                     }
 
                     if (map[x][y].getType() == 4) {
